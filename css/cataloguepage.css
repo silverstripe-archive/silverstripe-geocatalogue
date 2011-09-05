@@ -1,0 +1,42 @@
+/* GENERIC STYLES 
+-------------------------------------------- */
+@page { size: A4 landscape }
+
+.result_item {
+	clear: both;
+	padding-top: 10px;
+}
+
+.results, .results_searchTerm {
+	padding-top: 15px;
+}
+
+.title {
+	padding-left: 5px;
+	clear: both;
+	font-size: 14px;
+	
+	background-color:#4EA3D7;
+	color:white;
+}
+
+.item {
+	width: 70%;
+	float: left;
+	margin:1em 0;
+	padding-left: 15px;	
+	font-size: 12px;
+}
+
+.header {
+	clear: both;
+	font-weight: normal;
+	width: 25%;
+	float: left;
+	
+	margin:1em 0;
+	padding: 0;
+	font-size: 12px;
+}
+.row {
+}
