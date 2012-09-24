@@ -1,0 +1,15 @@
+{
+	"name": "silverstripe-labs/geocatalogue",
+	"description": "GeoCatalogue module for SilverStripe.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe-labs", "geocatalogue"],
+	"authors": [
+	{
+		"name": "Rainer Spittel"
+	}
+	],
+	"require":
+	{
+		"silverstripe/framework": "2.4"
+	}
+}
