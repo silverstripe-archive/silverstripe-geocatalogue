@@ -1,0 +1,22 @@
+/* GENERIC STYLES 
+-------------------------------------------- */
+@page { size: A4 landscape }
+
+.header {
+    clear: both;
+    width: 25%;
+    float: left;
+    margin:1em 0;
+}
+
+.results {
+    padding-top: 15px;
+}
+
+.record .item {
+    width: 70%;
+    float: left;
+    margin: 1em 0 1.5em;
+    padding-left: 15px;
+    font-size: 12px;
+}

@@ -1,0 +1,30 @@
+---
+Name: geonetconfig
+---
+Catalogue:
+  'metadata_standard': 'iso'
+
+  'search_form': 'CatalogueSearchForm'
+
+  standard_definitions:
+    iso:
+      'name': 'ISO19139'
+      'request': 'cswGetRecordsSummaryISO_xml'
+      'response': '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl'
+      'full_response': '../geocatalog/xslt/ISO19139/iso19139full_to_silverstripe.xsl'
+
+    anzlic:
+      'name': 'ANZLIC Metadata Profile'
+      'request': 'cswGetRecordsSummaryISO_xml'
+      'response': '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl'
+
+    dublin:
+      'name': 'Dublin Core'
+      'request': 'cswGetRecordsSummaryDC_xml'
+      'response': '../geocatalog/xslt/DublicCore/dubliccore_to_silverstripe.xsl'
+
+    mcp:
+      'name': 'Australian Marine Community Profile MCP'
+      'request': 'cswGetRecordsSummaryISO_xml'
+      'response':      'ParseXML2MCPSummary'
+      'full_response': 'ParseXML2MCP'
