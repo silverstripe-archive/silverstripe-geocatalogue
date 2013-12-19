@@ -33,10 +33,7 @@ class CatalogueHomePage extends Page {
 			$dataObjectSet = DataObject::get($class);
 			
 			if ($dataObjectSet) {
-				$iter = $dataObjectSet->getIterator();
-				$item = $iter->current();
-
-				while ($item) {
+				foreach($dataObjectSet as $item) {
 					$pages[$item->URLSegment] = $item->Title ." (url: ".$item->URLSegment.")";
 					$item =$iter->next();
 				}
