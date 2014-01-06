@@ -35,7 +35,6 @@ class CatalogueHomePage extends Page {
 			if ($dataObjectSet) {
 				foreach($dataObjectSet as $item) {
 					$pages[$item->URLSegment] = $item->Title ." (url: ".$item->URLSegment.")";
-					$item =$iter->next();
 				}
 			}
 		}
