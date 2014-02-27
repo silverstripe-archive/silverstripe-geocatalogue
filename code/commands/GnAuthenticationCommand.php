@@ -11,7 +11,7 @@
 /**
  * GnAuthenticationCommand class - implements the API to manage user credentials for GeoNetwork API calls.
  *
- * @package geocatalog
+ * @package geocatalogue
  * @author Rainer Spittel
  **/
 class GnAuthenticationCommand extends ControllerCommand {

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage commands
  */
 
@@ -106,7 +106,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		// parse catalogue response
 		$translateData = array(
 			'xml' => $responseXML,
-			'xsl' => '../geocatalog/xslt/gnInsertResponse.xsl',
+			'xsl' => '../geocatalogue/xslt/gnInsertResponse.xsl',
 		);
 
 		$cmd = $this->getController()->getCommand("TranslateXML", $translateData);

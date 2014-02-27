@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  */
 class GnPublishMetadataCommandTest extends SapphireTest {
@@ -9,7 +9,7 @@ class GnPublishMetadataCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GnGetUUIDOfRecordByIDCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GnGetUUIDOfRecordByIDCommandTest.yml';
 
 	static $xsl_path = '';
 	
@@ -38,9 +38,9 @@ class GnPublishMetadataCommandTest extends SapphireTest {
 		self::$xsl_path = GnPublishMetadataCommand::get_xsl_path();
 		if( in_array('cli-script.php', scandir('.')) ) {
 			// system is in sapphire directory
-			GnPublishMetadataCommand::set_xsl_path('../geocatalog/xslt/gnInsertResponse.xsl');
-		} else if( in_array('geocatalog', scandir('.'))) {
-			GnPublishMetadataCommand::set_xsl_path('geocatalog/xslt/gnInsertResponse.xsl');
+			GnPublishMetadataCommand::set_xsl_path('../geocatalogue/xslt/gnInsertResponse.xsl');
+		} else if( in_array('geocatalogue', scandir('.'))) {
+			GnPublishMetadataCommand::set_xsl_path('geocatalogue/xslt/gnInsertResponse.xsl');
 		}		
 	}
 
@@ -114,7 +114,7 @@ class GnPublishMetadataCommandTest extends SapphireTest {
 
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  *
  * Mockup controller class to simulate the GeoNetwork side in this test.

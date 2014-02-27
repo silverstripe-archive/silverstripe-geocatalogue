@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage code
  */
 
@@ -39,7 +39,7 @@ class CataloguePage extends Page {
     public function getCMSFields() {
         $fields = parent::getCMSFields();
 
-        Requirements::javascript('geocatalog/javascript/GeonetworkUrlValidator.js');
+        Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 
         $fields->addFieldsToTab('Root.Catalog', array(new TextField('GeonetworkBaseURL', 'The base URL of the GeoNetwork-Server you want to connect to:'),
                                                       new TextField('GeonetworkUsername', 'GeoNetwork username'),
@@ -124,7 +124,7 @@ class CataloguePage_Controller extends Page_Controller {
 
     public function init() {
         parent::init();
-        Requirements::css('geocatalog/css/cataloguepage.css');
+        Requirements::css('geocatalogue/css/cataloguepage.css');
     }
 
     /**
