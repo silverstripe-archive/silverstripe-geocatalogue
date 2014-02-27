@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  */
 class TranslateXMLCommandTest extends SapphireTest {
@@ -9,7 +9,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GetRecordsCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
 	static $ISO19139response='<?xml version="1.0" encoding="UTF-8"?>
 				<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
@@ -255,7 +255,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => self::$ISO19139response,
-			'xsl' => $baseURL.'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("TranslateXML", $data);
 		$result = $cmd->execute();
@@ -281,7 +281,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => self::$HTMLResponseNoDocType ,
-			'xsl' => $baseURL.'/geocatalog/xslt/iso19139_to_silverstripe.xsl',
+			'xsl' => $baseURL.'/geocatalogue/xslt/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("TranslateXML", $data);
 		//execute has to throw an error
@@ -308,7 +308,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 
 		$data = array(
 			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => $baseURL.'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("TranslateXML", $data);
 		//execute has not to throw an error
@@ -335,7 +335,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 
 		$data = array(
 			'xml' => '' ,
-			'xsl' => $baseURL.'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("TranslateXML", $data);
 		//execute has not to throw an error
@@ -362,7 +362,7 @@ class TranslateXMLCommandTest extends SapphireTest {
 
 		$data = array(
 			'xml' => null,
-			'xsl' => $baseURL.'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("TranslateXML", $data);
 		//execute has not to throw an error

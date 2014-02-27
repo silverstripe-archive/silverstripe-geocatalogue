@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Robin Marshall (robin at mdigital dot co dot nz)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage model
  * 
  * The MDCitationDate Data object is used to model the ISO19139 MD-Date XML

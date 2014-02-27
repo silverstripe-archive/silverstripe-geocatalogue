@@ -10,11 +10,11 @@ class CataloguePage_ControllerOLD extends Page_Controller {
 //    /**
 //     * Structure to maintain standards with getrecord commands.
 //     */
-//    static protected $xml_response = array('iso' => '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl', 'anzlic' => '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl', 'dublin' => '../geocatalog/xslt/DublicCore/dubliccore_to_silverstripe.xsl', 'mcp' => '../geocatalog/xslt/MCP/mcp_to_silverstripe.xsl',);
+//    static protected $xml_response = array('iso' => '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl', 'anzlic' => '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl', 'dublin' => '../geocatalogue/xslt/DublicCore/dubliccore_to_silverstripe.xsl', 'mcp' => '../geocatalogue/xslt/MCP/mcp_to_silverstripe.xsl',);
 //    /**
 //     * Structure to maintain standards with getrecordbyid commands.
 //     */
-//    static protected $xml_full_response = array('iso' => '../geocatalog/xslt/ISO19139/iso19139full_to_silverstripe.xsl', 'mcp' => '../geocatalog/xslt/MCP/mcpfull_to_silverstripe.xsl');
+//    static protected $xml_full_response = array('iso' => '../geocatalogue/xslt/ISO19139/iso19139full_to_silverstripe.xsl', 'mcp' => '../geocatalogue/xslt/MCP/mcpfull_to_silverstripe.xsl');
 //    /**
 //     * Structure to maintain standards with labels (pure for front-end).
 //     */
@@ -164,7 +164,7 @@ class CataloguePage_ControllerOLD extends Page_Controller {
         Requirements::themedCSS('layout');
         Requirements::themedCSS('typography');
         Requirements::themedCSS('form');
-        Requirements::css('geocatalog/css/cataloguepage.css');
+        Requirements::css('geocatalogue/css/cataloguepage.css');
 
         $this->extend('extendInit');
     }

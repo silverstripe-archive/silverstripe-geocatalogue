@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage commands
  */
 
@@ -185,7 +185,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 	 */
 	public function init() {
 		parent::init();
-		Requirements::javascript("geocatalog/javascript/metadata_form.js");
+		Requirements::javascript("geocatalogue/javascript/metadata_form.js");
 		Requirements::themedCSS('layout');
 		Requirements::themedCSS('typography');
 		Requirements::themedCSS('form');

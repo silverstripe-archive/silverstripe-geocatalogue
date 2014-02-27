@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  */
 class GenerateISO19139XMLCommandTest extends SapphireTest {
@@ -9,7 +9,7 @@ class GenerateISO19139XMLCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GetRecordsCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
 	static $MDMetaDataItem = array(
 		'fileIdentifier' => '0587e442-eaee-470d-a0d1-3e3a54cc983b',

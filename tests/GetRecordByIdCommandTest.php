@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  */
 class GetRecordByIdCommandTest extends SapphireTest {
@@ -9,7 +9,7 @@ class GetRecordByIdCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GetRecordByIdCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordByIdCommandTest.yml';
 
 	protected $controller = null;
 
@@ -201,7 +201,7 @@ class GetRecordByIdCommandTest extends SapphireTest {
 
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  *
  * Mockup controller class to simulate the GeoNetwork side in this test.

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage commands
  */
 
@@ -16,7 +16,7 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 	static $api_url = 'srv/en/metadata.admin';
 	static $RequireAuth = true;
 
-	static $xsl_path = '../geocatalog/xslt/gnInsertResponse.xsl';
+	static $xsl_path = '../geocatalogue/xslt/gnInsertResponse.xsl';
 
 	static function get_api_url() {
 		return self::$api_url;

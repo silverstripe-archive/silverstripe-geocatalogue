@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage model
  * 
  * The MDContact Data object is used to model the ISO19139 MD-Contact XML

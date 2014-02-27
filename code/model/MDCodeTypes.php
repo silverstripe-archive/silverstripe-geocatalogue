@@ -2,7 +2,7 @@
 /**
  *
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage model
  */
 class MDCodeTypes extends Object {

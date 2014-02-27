@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage tests
  */
 class MDDataObjectTest extends SapphireTest {

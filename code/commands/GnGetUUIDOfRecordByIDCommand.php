@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
+ * @package geocatalogue
  * @subpackage commands
  */
 
@@ -20,7 +20,7 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 	
 	static $RequireAuth = true;
 
-	static $xsl_path = '../geocatalog/xslt/gnParseUUID.xsl';
+	static $xsl_path = '../geocatalogue/xslt/gnParseUUID.xsl';
 
 	private $username = '';
 	
