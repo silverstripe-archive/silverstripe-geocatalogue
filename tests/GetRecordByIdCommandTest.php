@@ -9,7 +9,7 @@ class GetRecordByIdCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GetRecordByIdCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordByIdCommandTest.yml';
 
 	protected $controller = null;
 

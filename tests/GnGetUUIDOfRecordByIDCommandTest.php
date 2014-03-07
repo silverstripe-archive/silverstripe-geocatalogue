@@ -9,7 +9,7 @@ class GnGetUUIDOfRecordByIDCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GnGetUUIDOfRecordByIDCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GnGetUUIDOfRecordByIDCommandTest.yml';
 
 	static $xsl_path = '';
 
@@ -38,9 +38,9 @@ class GnGetUUIDOfRecordByIDCommandTest extends SapphireTest {
 		self::$xsl_path = GnGetUUIDOfRecordByIDCommand::get_xsl_path();
 		if( in_array('cli-script.php', scandir('.')) ) {
 			// system is in sapphire directory
-			GnGetUUIDOfRecordByIDCommand::set_xsl_path('../geocatalog/xslt/gnParseUUID.xsl');
+			GnGetUUIDOfRecordByIDCommand::set_xsl_path('../geocatalogue/xslt/gnParseUUID.xsl');
 		} else if( in_array('geocatalog', scandir('.'))) {
-			GnGetUUIDOfRecordByIDCommand::set_xsl_path('geocatalog/xslt/gnParseUUID.xsl');
+			GnGetUUIDOfRecordByIDCommand::set_xsl_path('geocatalogue/xslt/gnParseUUID.xsl');
 		}		
 	}
 

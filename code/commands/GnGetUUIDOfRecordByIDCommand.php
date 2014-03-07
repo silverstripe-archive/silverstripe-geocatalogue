@@ -20,7 +20,7 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 	
 	static $RequireAuth = true;
 
-	static $xsl_path = '../geocatalog/xslt/gnParseUUID.xsl';
+	static $xsl_path = '../geocatalogue/xslt/gnParseUUID.xsl';
 
 	private $username = '';
 	

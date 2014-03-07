@@ -69,7 +69,7 @@ class RegisterDataPage extends Page {
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
 		
-		Requirements::javascript('geocatalog/javascript/GeonetworkUrlValidator.js');
+		Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 		$pagesSearch = CatalogueHomePage::get_page_subclasses('CataloguePage');
 	
 		// customise form fields
@@ -185,7 +185,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 	 */
 	public function init() {
 		parent::init();
-		Requirements::javascript("geocatalog/javascript/metadata_form.js");
+		Requirements::javascript("geocatalogue/javascript/metadata_form.js");
 		Requirements::themedCSS('layout');
 		Requirements::themedCSS('typography');
 		Requirements::themedCSS('form');

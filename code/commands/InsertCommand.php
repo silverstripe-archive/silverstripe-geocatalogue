@@ -48,7 +48,7 @@ class InsertCommand extends ControllerCommand {
 		// parse catalogue response
 		$data = array(
 			'xml' => $responseXML,
-			'xsl' => '../geocatalog/xslt/insertResponse.xsl',
+			'xsl' => '../geocatalogue/xslt/insertResponse.xsl',
 		);
 
 		$cmd = $this->getController()->getCommand("TranslateXML", $data);

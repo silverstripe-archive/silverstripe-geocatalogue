@@ -21,7 +21,7 @@ class BrowsePage extends CataloguePage {
 	 * @return FieldSet
 	 */ 
 	function getCMSFields() {
-		Requirements::javascript('geocatalog/javascript/GeonetworkUrlValidator.js');	
+		Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 		
 		$fields = parent::getCMSFields();
 		return $fields;

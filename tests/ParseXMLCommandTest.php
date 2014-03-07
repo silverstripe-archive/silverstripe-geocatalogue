@@ -9,7 +9,7 @@ class ParseXMLCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-	static $fixture_file = 'geocatalog/tests/GetRecordsCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
 	static $ISO19139response='<?xml version="1.0" encoding="UTF-8"?>
 				<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
@@ -212,7 +212,7 @@ class ParseXMLCommandTest extends SapphireTest {
 	
 	protected $controller = null;
 
-	protected $directory_prefix = '../geocatalog/xslt/';
+	protected $directory_prefix = '../geocatalogue/xslt/';
 
 	/**
 	 * Initiate the controller and page classes and configure GeoNetwork service
@@ -235,9 +235,9 @@ class ParseXMLCommandTest extends SapphireTest {
 		// tests via a CI environment.
 		if( in_array('cli-script.php', scandir('.')) ) {
 			// system is in sapphire directory
-			$this->directory_prefix = '../geocatalog/xslt/';
+			$this->directory_prefix = '../geocatalogue/xslt/';
 		} else if( in_array('geocatalog', scandir('.'))) {
-			$this->directory_prefix = 'geocatalog/xslt/';			
+			$this->directory_prefix = 'geocatalogue/xslt/';
 		}
 	}
 
@@ -289,7 +289,7 @@ class ParseXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => self::$HTMLResponseNoDocType ,
-			'xsl' => '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("ParseXML", $data);
 		//execute has to throw an error
@@ -314,7 +314,7 @@ class ParseXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => Director::baseFolder().'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("ParseXML", $data);
 		//execute has not to throw an error
@@ -342,7 +342,7 @@ class ParseXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => '' ,
-			'xsl' => Director::baseFolder().'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("ParseXML", $data);
 		//execute has not to throw an error
@@ -368,7 +368,7 @@ class ParseXMLCommandTest extends SapphireTest {
 		//seting up the environment
 		$data = array(
 			'xml' => null,
-			'xsl' => Director::baseFolder().'/geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
 		);
 		$cmd = $this->controller->getCommand("ParseXML", $data);
 		//execute has not to throw an error

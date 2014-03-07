@@ -10,18 +10,18 @@ Catalogue:
     iso:
       'name': 'ISO19139'
       'request': 'cswGetRecordsSummaryISO_xml'
-      'response': '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl'
-      'full_response': '../geocatalog/xslt/ISO19139/iso19139full_to_silverstripe.xsl'
+      'response': '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl'
+      'full_response': '../geocatalogue/xslt/ISO19139/iso19139full_to_silverstripe.xsl'
 
     anzlic:
       'name': 'ANZLIC Metadata Profile'
       'request': 'cswGetRecordsSummaryISO_xml'
-      'response': '../geocatalog/xslt/ISO19139/iso19139_to_silverstripe.xsl'
+      'response': '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl'
 
     dublin:
       'name': 'Dublin Core'
       'request': 'cswGetRecordsSummaryDC_xml'
-      'response': '../geocatalog/xslt/DublicCore/dubliccore_to_silverstripe.xsl'
+      'response': '../geocatalogue/xslt/DublicCore/dubliccore_to_silverstripe.xsl'
 
     mcp:
       'name': 'Australian Marine Community Profile MCP'

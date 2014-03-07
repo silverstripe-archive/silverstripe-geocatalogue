@@ -9,7 +9,7 @@ class GetRecordsCommandTest extends SapphireTest {
 	/**
 	 * Also uses SimpleNzctFixture in setUp()
 	 */
-  static $fixture_file = 'geocatalog/tests/GetRecordsCommandTest.yml';
+  static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
 	protected $controller = null;
 
