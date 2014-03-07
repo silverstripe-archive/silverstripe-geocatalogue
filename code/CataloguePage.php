@@ -39,7 +39,7 @@ class CataloguePage extends Page {
     public function getCMSFields() {
         $fields = parent::getCMSFields();
 
-        Requirements::javascript('geocatalog/javascript/GeonetworkUrlValidator.js');
+        Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 
         $fields->addFieldsToTab('Root.Catalog', array(new TextField('GeonetworkBaseURL', 'The base URL of the GeoNetwork-Server you want to connect to:'),
                                                       new TextField('GeonetworkUsername', 'GeoNetwork username'),
@@ -124,7 +124,7 @@ class CataloguePage_Controller extends Page_Controller {
 
     public function init() {
         parent::init();
-        Requirements::css('geocatalog/css/cataloguepage.css');
+        Requirements::css('geocatalogue/css/cataloguepage.css');
     }
 
     /**
@@ -339,18 +339,20 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $query
      */
     protected function calculatePaginationValues($resultSet, $query) {
+
         $nextRecord = $resultSet->__get('nextRecord');
         $startPosition = $query->get('startPosition');
 
-        $temp = floor($query->get('startPosition') / $this->maxRecords) + 1;
+        $temp = floor($startPosition / $this->maxRecords) + 1;
         $this->data()->pagination_page_number = $temp;
         $this->data()->pagination_is_first_page = ($temp == 1) ? true : false;
 
         $matchedRecords = $resultSet->__get('numberOfRecordsMatched');
-        $temp = floor(($matchedRecords) / $this->maxRecords)+1;
+
+        $temp = ceil($matchedRecords / $this->maxRecords);
+
         $this->data()->pagination_number_of_pages = $temp;
         $this->data()->pagination_is_last_page = ($this->data()->pagination_page_number == $this->data()->pagination_number_of_pages) ? true : false;
-
 
         $temp = $nextRecord;
         if ($nextRecord > $matchedRecords) {
