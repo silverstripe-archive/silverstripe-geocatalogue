@@ -55,9 +55,17 @@ class ParseXML2MCPCommand extends ParseXMLCommand {
             foreach ($partyList as $party) {
                 $mdContact = array();
 
-                $mdContact['MDIndividualName']   = $xpath->query('gmd:individualName/gco:CharacterString',$party)->item(0)->nodeValue;
-                $mdContact['MDOrganisationName'] = $xpath->query('gmd:organisationName/gco:CharacterString',$party)->item(0)->nodeValue;
-                $mdContact['MDPositionName']     = $xpath->query('gmd:positionName/gco:CharacterString',$party)->item(0)->nodeValue;
+                if ($xpath->query('gmd:individualName/gco:CharacterString',$party)->item(0)) {
+                    $mdContact['MDIndividualName']   = $xpath->query('gmd:individualName/gco:CharacterString',$party)->item(0)->nodeValue;
+                }
+
+                if ($xpath->query('gmd:organisationName/gco:CharacterString',$party)->item(0)) {
+                    $mdContact['MDOrganisationName'] = $xpath->query('gmd:organisationName/gco:CharacterString',$party)->item(0)->nodeValue;
+                }
+
+                if ($xpath->query('gmd:positionName/gco:CharacterString',$party)->item(0)) {
+                    $mdContact['MDPositionName']     = $xpath->query('gmd:positionName/gco:CharacterString',$party)->item(0)->nodeValue;
+                }
 
                 $contact = $xpath->query('gmd:contactInfo/gmd:CI_Contact',$party)->item(0);
 
@@ -71,16 +79,31 @@ class ParseXML2MCPCommand extends ParseXMLCommand {
                 $mdContact['MDVoice:MDPhoneNumber'] = $mdVoice;
 
                 // allows only 1 facsimile number
-                $mdContact['MDFacsimile'] = $xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)->nodeValue;
+                if ($xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)) {
+                    $mdContact['MDFacsimile'] = $xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)->nodeValue;
+                }
 
                 $addressList = $xpath->query('gmd:address/gmd:CI_Address',$contact);
                 foreach ($addressList as $address) {
-                    $mdContact['MDDeliveryPoint']         = $xpath->query('gmd:deliveryPoint/gco:CharacterString',$address)->item(0)->nodeValue;
-                    $mdContact['MDCity']                  = $xpath->query('gmd:city/gco:CharacterString',$address)->item(0)->nodeValue;
-                    $mdContact['MDAdministrativeArea']    = $xpath->query('gmd:administrativeArea/gco:CharacterString',$address)->item(0)->nodeValue;
-                    $mdContact['MDPostalCode']            = $xpath->query('gmd:postalCode/gco:CharacterString',$address)->item(0)->nodeValue;
-                    $mdContact['MDCountry']               = $xpath->query('gmd:country/gco:CharacterString',$address)->item(0)->nodeValue;
-                    $mdContact['MDElectronicMailAddress'] = $xpath->query('gmd:electronicMailAddress/gco:CharacterString',$address)->item(0)->nodeValue;
+
+                    if ($xpath->query('gmd:deliveryPoint/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDDeliveryPoint'] = $xpath->query('gmd:deliveryPoint/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
+                    if ($xpath->query('gmd:city/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDCity'] = $xpath->query('gmd:city/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
+                    if ($xpath->query('gmd:administrativeArea/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDAdministrativeArea'] = $xpath->query('gmd:administrativeArea/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
+                    if ($xpath->query('gmd:postalCode/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDPostalCode'] = $xpath->query('gmd:postalCode/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
+                    if ($xpath->query('gmd:country/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDCountry'] = $xpath->query('gmd:country/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
+                    if ($xpath->query('gmd:electronicMailAddress/gco:CharacterString',$address)->item(0)) {
+                        $mdContact['MDElectronicMailAddress'] = $xpath->query('gmd:electronicMailAddress/gco:CharacterString',$address)->item(0)->nodeValue;
+                    }
                 }
 
                 // add mdContact object to the contact relationship object
@@ -200,16 +223,30 @@ class ParseXML2MCPCommand extends ParseXMLCommand {
                     $mdContact['MDVoice:MDPhoneNumber'] = $mdVoice;
 
                     // allows only 1 facsimile number
-                    $mdContact['MDFacsimile'] = $xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)->nodeValue;
+                    if ($xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)) {
+                        $mdContact['MDFacsimile'] = $xpath->query('gmd:phone/gmd:CI_Telephone/gmd:facsimile/gco:CharacterString',$contact)->item(0)->nodeValue;
+                    }
 
                     $addressList = $xpath->query('gmd:address/gmd:CI_Address',$contact);
                     foreach ($addressList as $address) {
-                        $mdContact['MDDeliveryPoint']         = $xpath->query('gmd:deliveryPoint/gco:CharacterString',$address)->item(0)->nodeValue;
-                        $mdContact['MDCity']                  = $xpath->query('gmd:city/gco:CharacterString',$address)->item(0)->nodeValue;
-                        $mdContact['MDAdministrativeArea']    = $xpath->query('gmd:administrativeArea/gco:CharacterString',$address)->item(0)->nodeValue;
-                        $mdContact['MDPostalCode']            = $xpath->query('gmd:postalCode/gco:CharacterString',$address)->item(0)->nodeValue;
-                        $mdContact['MDCountry']               = $xpath->query('gmd:country/gco:CharacterString',$address)->item(0)->nodeValue;
-                        $mdContact['MDElectronicMailAddress'] = $xpath->query('gmd:electronicMailAddress/gco:CharacterString',$address)->item(0)->nodeValue;
+                        if ($xpath->query('gmd:deliveryPoint/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDDeliveryPoint']         = $xpath->query('gmd:deliveryPoint/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
+                        if ($xpath->query('gmd:city/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDCity']                  = $xpath->query('gmd:city/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
+                        if ($xpath->query('gmd:administrativeArea/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDAdministrativeArea']    = $xpath->query('gmd:administrativeArea/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
+                        if ($xpath->query('gmd:postalCode/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDPostalCode']            = $xpath->query('gmd:postalCode/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
+                        if ($xpath->query('gmd:country/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDCountry']               = $xpath->query('gmd:country/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
+                        if ($xpath->query('gmd:electronicMailAddress/gco:CharacterString',$contact)->item(0)) {
+                            $mdContact['MDElectronicMailAddress'] = $xpath->query('gmd:electronicMailAddress/gco:CharacterString',$address)->item(0)->nodeValue;
+                        }
                     }
 
                     // add mdContact object to the contact relationship object
