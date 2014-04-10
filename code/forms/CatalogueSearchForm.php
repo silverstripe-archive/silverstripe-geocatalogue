@@ -27,7 +27,6 @@ class CatalogueSearchForm extends Form {
 	 */
 	function __construct($controller, $name, FieldSet $fields = null, FieldSet $actions = null, $validator = null, $defaults = null) {
 
-		$format     = $defaults['format'];
 		$searchTerm = $defaults['searchTerm'];
 
 		$bboxUpper = $bboxLower = null;
@@ -35,20 +34,16 @@ class CatalogueSearchForm extends Form {
 			$bboxUpper = $defaults['bboxUpper'];
 			$bboxLower = $defaults['bboxLower'];
 		}
-		
-		$values = CataloguePage_Controller::get_standard_names();
-		
+
 		$upperField = new HiddenField('bboxUpper', _t('SearchForm.SEARCH', 'bboxUpper'), $bboxUpper);
 		$upperField->addExtraClass('upper');
 
 		$lowerField = new HiddenField('bboxLower', _t('SearchForm.SEARCH', 'bboxLower'), $bboxLower);
 		$lowerField->addExtraClass('lower');
-		
 		if(!$fields) {
-			$fields = new FieldSet(
+			$fields = new FieldList(
 				new TextField('searchTerm', _t('SearchForm.SEARCH', 'Search'), $searchTerm),
-				$upperField, $lowerField,
-				new OptionsetField('format', _t('SearchForm.MetadataStandard', 'Metadata Standard'), $values, $format)			
+				$upperField, $lowerField
 			);
 		}
 
@@ -57,7 +52,7 @@ class CatalogueSearchForm extends Form {
 		}
 		
 		if(!$actions) {
-			$actions = new FieldSet(
+			$actions = new FieldList(
 				new FormAction("submit", _t('SearchForm.Search', 'Search'))
 			);
 		}
