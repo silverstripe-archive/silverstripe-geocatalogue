@@ -102,7 +102,24 @@ class MDMetadata extends MDDataObject {
 	public function MetadataCIOnlineResources() {
 		return $this->getFilteredCIOnlineResources( array('WWW:LINK-1.0-http--metadata-URL'));
 	}
-	
+
+	public function getMDAbstractJson() {
+		return Convert::raw2json($this->MDAbstract);
+	}
+
+	/**
+	 * This method is a work around as the $Top method in SSViewer does break in templates Included into
+	 * a layout template.
+	 *
+	 * @param null $action
+	 *
+	 * @return string
+	 */
+	public function Link($action = null) {
+		$controller = Controller::curr();
+		return $controller->Link($action);
+	}
+
 	/**
 	 * Returns all CIOnlineResources objects of this metadata record which
 	 * are web-addresses.
