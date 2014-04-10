@@ -195,9 +195,14 @@ class CataloguePage_Controller extends Page_Controller {
         $this->data()->result_items = $resultSet->__get('Items');
         $this->data()->search_term = $query->get('searchTerm');
 
+	    $this->data()->sortBy = $query->get('sortBy');
+	    $this->data()->sortOrder = $query->get('sortOrder');
+	    $this->data()->bboxUpper = $query->get('bboxUpper');
+	    $this->data()->bboxLower = $query->get('bboxLower');
+
         // calculate pagination values
         $this->calculatePaginationValues($resultSet, $query);
-        return $this->render();;
+        return $this->render();
     }
 
     /**
@@ -351,8 +356,10 @@ class CataloguePage_Controller extends Page_Controller {
 
         $temp = ceil($matchedRecords / $this->maxRecords);
 
+	    $this->data()->number_of_records_matched = $matchedRecords;
         $this->data()->pagination_number_of_pages = $temp;
         $this->data()->pagination_is_last_page = ($this->data()->pagination_page_number == $this->data()->pagination_number_of_pages) ? true : false;
+	    $this->data()->pageindex_of_last_pages = (($this->data()->pagination_number_of_pages-1) * $this->maxRecords) + 1;
 
         $temp = $nextRecord;
         if ($nextRecord > $matchedRecords) {
@@ -363,6 +370,21 @@ class CataloguePage_Controller extends Page_Controller {
         $temp = $startPosition - $this->maxRecords;
         if ($temp < 1) $temp = 1;
         $this->data()->pagination_prev_index = $temp;
+
+	    $numlinks = new ArrayList();
+
+		$startNum = $this->data()->pagination_page_number < 3 ? 1 : ($this->data()->pagination_page_number - 2);
+		$endNum = ($startNum + 10) > $this->data()->pagination_number_of_pages ? $this->data()->pagination_number_of_pages : ($startNum + 10);
+
+		for ($i = $startNum; $i <= $endNum; $i++) {
+			$linkData = array('label' => $i, 'linknum' => ($i - 1) * $this->maxRecords + 1);
+
+			if ($i == $this->data()->pagination_page_number) {
+				$linkData['current'] = true;
+			}
+			$numlinks->push(new ArrayData($linkData));
+        }
+		$this->data()->numlinks = $numlinks;
     }
 
     /**
@@ -378,14 +400,29 @@ class CataloguePage_Controller extends Page_Controller {
             $params['startPosition'] = $params['ID'];
             if ($params['startPosition'] < 1) $params['startPosition'] = 1;
 
-            if ( isset($variables['searchTerm'])) {
+            if ( isset($variables['searchTerm']) && $variables['searchTerm']) {
                 $params['searchTerm'] = $variables['searchTerm'];
             }
 
             if ($params['OtherID']) {
                 $params['searchTerm'] = $params['OtherID'];
             }
+
+	        if ( isset($variables['sortBy']) && $variables['sortBy']) {
+                $params['sortBy'] = $variables['sortBy'];
+	        }
+
+	        if ( isset($variables['sortOrder']) && $variables['sortOrder']) {
+                $params['sortOrder'] = $variables['sortOrder'];
+	        }
+
+	        if ( isset($variables['bboxUpper']) && isset($variables['bboxLower']) && $variables['bboxUpper'] && $variables['bboxLower']) {
+                $params['bboxUpper'] = $variables['bboxUpper'];
+                $params['bboxLower'] = $variables['bboxLower'];
+	        }
+
         }
+
         return $params;
     }
 
@@ -411,13 +448,13 @@ class CataloguePage_Controller extends Page_Controller {
         $defaults = array();
         $defaults['searchTerm'] = '';
         $defaults['format'] = Config::inst()->get('Catalogue', 'metadata_standard');
+
         if ($params) {
             if (isset($params['searchTerm'])) {
                 $defaults['searchTerm'] = $params['searchTerm'];
             } else {
                 $defaults['searchTerm'] = $httpParams['OtherID'];
             }
-            if (isset($params['format'])) $defaults['format'] = self::validate_request_format($params['format']);
         }
 
         if (isset($params['bboxUpper']) && isset($params['bboxLower'])) {
