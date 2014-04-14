@@ -112,8 +112,7 @@ class ParseXMLCommand extends ControllerCommand {
 											'nextRecord' => $nextRecord,
 											'numberOfRecordsMatched' => $numberOfRecordsMatched,
 											'numberOfRecordsReturned' => $numberOfRecordsReturned
-											)
-                    );
+									));
 		return $result;
 	}
 
