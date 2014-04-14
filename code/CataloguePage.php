@@ -321,10 +321,10 @@ class CataloguePage_Controller extends Page_Controller {
      * @return mixed
      */
     public function parseResponse($standard, $responseXML, $searchTerm) {
-        $standards = Config::inst()->get('Catalogue', 'standard_definitions');
 
-        $data = array('xml' => $responseXML);
-        // var_dump($standards[$standard]['response']);
+	    $standards = Config::inst()->get('Catalogue', 'standard_definitions');
+
+	    $data = array('xml' => $responseXML);
         $cmd = $this->getCommand($standards[$standard]['response'], $data);
 
         $result = $cmd->execute();
