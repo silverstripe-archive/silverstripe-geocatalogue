@@ -231,11 +231,6 @@ class CataloguePage_Controller extends Page_Controller {
 
         $outputFormat = $params['OtherID'];
 
-        $format = Config::inst()->get('Catalogue', 'metadata_standard');
-        if (!$this->validateRequestFormat($format)) {
-            throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
-        }
-
         $data = array('fileIdentifier' => Convert::raw2xml($id),
                       'outputFormat' => Convert::raw2xml($outputFormat),
                       'requestxml' => 'cswGetRecordByID_xml');
@@ -274,6 +269,11 @@ class CataloguePage_Controller extends Page_Controller {
 
         // parse XML response and create the SilverStripe data-structure.
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
+	    $format = $this->getFormat($responseXML);
+
+		if (!$this->validateRequestFormat($format)) {
+			throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
+		}
 
         $data = array('xml' => $responseXML);
 
@@ -468,6 +468,39 @@ class CataloguePage_Controller extends Page_Controller {
         $form = new $searchForm($this, 'dogetrecords', null, null, null, $defaults);
         return $form;
     }
+
+	/**
+	 * This method parses the XML Record of the CSW server to determine which standard is used.
+	 * Currently the system supports ANZLIC/ISO19139 and MCP only.
+	 *
+	 * @param $responseXML
+	 *
+	 * @return string
+	 */
+	protected function getFormat($responseXML) {
+		$format = Config::inst()->get('Catalogue', 'metadata_standard');
+
+		$doc = new DOMDocument();
+		$doc->loadXML($responseXML);
+
+		$xpath = new DOMXPath($doc);
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+
+		$responseDOM = $xpath->query('/csw:GetRecordByIdResponse');
+		$searchResultItem = $responseDOM->item(0);
+
+		foreach($searchResultItem->childNodes as $child) {
+			if($child->nodeType == XML_ELEMENT_NODE) {
+				if($child->nodeName == 'mcp:MD_Metadata') {
+					$format = 'mcp';
+				}
+				else if($child->nodeName == 'gmd:MD_Metadata') {
+					$format = 'anzlic';
+				}
+			}
+		}
+		return $format;
+	}
 
 }
 
