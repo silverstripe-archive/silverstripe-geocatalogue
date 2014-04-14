@@ -111,14 +111,14 @@ class CataloguePage_Controller extends Page_Controller {
     protected $maxRecords = 10;
 
     public static function get_search_form_name() {
-        $formname = Config::inst()->get('Catalogue', 'search_form');
-        return $formname;
+        return Config::inst()->get('Catalogue', 'search_form');
     }
 
     public function getGeoNetworkBaseURL() {
         $url = $this->data()->GeonetworkBaseURL;
-        if (!isset($url) || $url == '') throw new CataloguePage_Exception('URL to Metadata Catalogue not defined.');
-
+        if (!isset($url) || $url == '') {
+	        throw new CataloguePage_Exception('URL to Metadata Catalogue not defined.');
+        }
         return $url;
     }
 
@@ -139,6 +139,7 @@ class CataloguePage_Controller extends Page_Controller {
     public function dogetrecords(SS_HTTPRequest $request) {
 
         $format = Config::inst()->get('Catalogue', 'metadata_standard');
+
         if (!$this->validateRequestFormat($format)) {
             throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
         }
