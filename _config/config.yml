@@ -12,13 +12,14 @@ Catalogue:
     iso:
       'name': 'ISO19139'
       'request': 'cswGetRecordsSummaryISO_xml'
-      'full_response': '../geocatalogue/xslt/ISO19139/iso19139full_to_silverstripe.xsl'
       'response': 'ParseXML2Summary',
+      'full_response': 'ParseXML2ANZLIC'
 
     anzlic:
       'name': 'ANZLIC Metadata Profile'
       'request': 'cswGetRecordsSummaryISO_xml'
       'response': 'ParseXML2Summary',
+      'full_response': 'ParseXML2ANZLIC'
       'response_old': '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl'
 
     dublin:
