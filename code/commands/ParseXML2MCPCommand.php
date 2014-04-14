@@ -9,7 +9,7 @@
 
 class ParseXML2MCPCommand extends ParseXMLCommand {
 
-    public function parseDocument($doc) {
+    public function parseDocument(DOMDocument $doc) {
         $numberOfRecordsMatched = 0;
         $numberOfRecordsReturned = 0;
         $nextRecord = 0;

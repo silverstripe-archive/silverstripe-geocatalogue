@@ -121,7 +121,7 @@ class ParseXMLCommand extends ControllerCommand {
      * @param $doc
      * @return array
      */
-    public function parseDocument($doc) {
+    public function parseDocument(DOMDocument $doc) {
         // get search summary
         $numberOfRecordsMatched = null;
         $numberOfRecordsReturned = null;
