@@ -294,7 +294,7 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $format
      * @return bool
      */
-    private function validateRequestFormat($format) {
+	protected function validateRequestFormat($format) {
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
         return isset($standards[$format]);
     }
@@ -344,7 +344,7 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $resultSet
      * @param $query
      */
-    protected function calculatePaginationValues($resultSet, $query) {
+	protected function calculatePaginationValues($resultSet, $query) {
 
         $nextRecord = $resultSet->__get('nextRecord');
         $startPosition = $query->get('startPosition');
@@ -392,7 +392,7 @@ class CataloguePage_Controller extends Page_Controller {
      * @param SS_HTTPRequest $request
      * @return array
      */
-    private function processRequestParameters(SS_HTTPRequest $request) {
+	protected function processRequestParameters(SS_HTTPRequest $request) {
         $params = array();
         if ($request != null) {
             $params = $request->allParams();
@@ -436,7 +436,7 @@ class CataloguePage_Controller extends Page_Controller {
      *
      * @return Form Simple Search Form
      */
-    function GeoNetworkSearchForm() {
+    public function GeoNetworkSearchForm() {
 
         $controller = Controller::curr();
 
