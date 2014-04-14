@@ -6,6 +6,8 @@ Catalogue:
 
   'search_form': 'CatalogueSearchForm'
 
+  'cssfile': 'geocatalogue/css/cataloguepage.css'
+
   standard_definitions:
     iso:
       'name': 'ISO19139'

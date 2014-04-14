@@ -124,7 +124,7 @@ class CataloguePage_Controller extends Page_Controller {
 
     public function init() {
         parent::init();
-        Requirements::css('geocatalogue/css/cataloguepage.css');
+        Requirements::css(Config::inst()->get('Catalogue', 'cssfile'));
     }
 
     /**
