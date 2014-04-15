@@ -26,12 +26,13 @@ class CataloguePage extends Page {
      * users to change the GeoNetwork configuration by accident.
      * @var string
      */
-    protected static $siteStatus = 'live';
-
-    static function set_site_status($value) {
-        CataloguePage::$siteStatus = $value;
+	public static function set_site_status($value) {
+	    return Config::inst()->update('Catalogue', 'site_status',$value);
     }
 
+	public static function get_site_status() {
+        return Config::inst()->get('Catalogue', 'site_status');
+    }
     /**
      *
      * @return FieldList
@@ -55,10 +56,6 @@ class CataloguePage extends Page {
         }
         // return the modified fieldset.
         return $fields;
-    }
-
-    static function get_site_status() {
-        return CataloguePage::$siteStatus;
     }
 
     /**
@@ -119,6 +116,7 @@ class CataloguePage_Controller extends Page_Controller {
         if (!isset($url) || $url == '') {
 	        throw new CataloguePage_Exception('URL to Metadata Catalogue not defined.');
         }
+
         return $url;
     }
 
@@ -294,7 +292,7 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $format
      * @return bool
      */
-	protected function validateRequestFormat($format) {
+    private function validateRequestFormat($format) {
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
         return isset($standards[$format]);
     }
@@ -421,9 +419,7 @@ class CataloguePage_Controller extends Page_Controller {
                 $params['bboxUpper'] = $variables['bboxUpper'];
                 $params['bboxLower'] = $variables['bboxLower'];
 	        }
-
         }
-
         return $params;
     }
 

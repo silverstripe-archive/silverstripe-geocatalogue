@@ -2,6 +2,8 @@
 Name: geonetconfig
 ---
 Catalogue:
+  'spamprotection_enabled': false
+
   'metadata_standard': 'iso'
 
   'search_form': 'CatalogueSearchForm'
