@@ -35,24 +35,25 @@ class RegisterMetadataForm extends Form {
 	 * @param FieldSet $actions All of the action buttons in the form - a {@link FieldSet} of {@link FormAction} objects
 	 * @param Validator $validator Override the default validator instance (Default: {@link RequiredFields})
 	 */
-	function __construct($controller, $name, FieldSet $fields = null, FieldSet $actions = null, $validator = null) {
-		
+	function __construct($controller, $name, FieldList $fields = null, FieldList $actions = null, $validator = null) {
 		$recaptchaField = $this->getRecaptchaField();
+
 		if(!$fields) {
 			// Create fields
 			
 			//adding extra class for custom validation
 			$title = new TextField('MDTitle',"TITLE"); 
 			$title->addExtraClass("required");
-			$fields = new FieldSet(
+
+			$fields = new FieldList(
 				new CompositeField (
 					$title,
 					new TextareaField('MDAbstract'),
-					new CalendarDateField('MDDateTime1'),
+					new DateField('MDDateTime1','MDDateTime1',$this->MDDateTime1),
 					new DropdownField('MDDateType1','DateType',MDCodeTypes::get_date_types(),""),	// drop down
-					new CalendarDateField('MDDateTime2'),
+					new DateField('MDDateTime2','MDDateTime2',$this->MDDateTime2),
 					new DropdownField('MDDateType2','DateType',MDCodeTypes::get_date_types(),""),	// drop down
-					new CalendarDateField('MDDateTime3'),
+					new DateField('MDDateTime3','MDDateTime3',$this->MDDateTime3),
 					new DropdownField('MDDateType3','DateType',MDCodeTypes::get_date_types(),""),	// drop down
 					new ListboxField('MDTopicCategory','Category',MDCodeTypes::get_categories(),"",8,true)	// drop down
 				),
@@ -143,7 +144,7 @@ class RegisterMetadataForm extends Form {
 		}
 		
 		if(!$actions) {
-	      $actions = new FieldSet(
+	      $actions = new FieldList(
 	         new FormAction('doRegisterMetadata', 'Submit')
 	      );
 		}
@@ -155,7 +156,7 @@ class RegisterMetadataForm extends Form {
 			        );
 		}
 		
-		$validator->setJavascriptValidationHandler('none');
+//		$validator->setJavascriptValidationHandler('none');
 		
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 	}
