@@ -10,6 +10,8 @@ Catalogue:
 
   'cssfile': 'geocatalogue/css/cataloguepage.css'
 
+  'site_status': 'setup'
+
   standard_definitions:
     iso:
       'name': 'ISO19139'

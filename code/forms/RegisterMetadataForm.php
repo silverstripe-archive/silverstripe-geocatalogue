@@ -15,13 +15,13 @@ class RegisterMetadataForm extends Form {
 
 	function getRecaptchaField() {
 		$field = null;
-		$spamProtector = SpamProtectorManager::get_spam_protector();
-		
-		if ($spamProtector == "RecaptchaProtector") {
+
+		if (Config::inst()->get('Catalogue', 'spamprotection_enabled') !== false) {
 			$field = new RecaptchaField("Recaptcha","Please enter text");
 			$field->jsOptions = array('theme' => 'clean');
-			$field->addExtraClass("required");		
+			$field->addExtraClass("required");
 		}
+
 		return $field;
 	}
 
