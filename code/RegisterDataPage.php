@@ -73,7 +73,7 @@ class RegisterDataPage extends Page {
 		$pagesSearch = CatalogueHomePage::get_page_subclasses('CataloguePage');
 	
 		// customise form fields
-		$fields->addFieldsToTab('Root.Content.Catalogue',
+		$fields->addFieldsToTab('Root.Catalogue',
 			array( 
 				new TextField('GeonetworkBaseURL', 'The base URL of the GeoNetwork-Server you want to connect to:'),
 				new EmailField('SendConfitmationsTo', 'Notify this email address of new submissions'),
