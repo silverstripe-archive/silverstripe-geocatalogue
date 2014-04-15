@@ -120,17 +120,19 @@ class RegisterDataPage extends Page {
  */
 class RegisterDataPage_Controller extends Page_Controller {
 
+	private static $allowed_actions = array('getTLAfor');
+
 	/**
 	 * Variable to store the classname of the form class.
 	 * @var String
-	 */ 
+	 */
 	public static $registrationFormName = "RegisterMetadataForm";
 
 	/**
 	 * Return the classname for the registration-form.
 	 * @see $searchFormName
 	 *
-	 * @return string classname. 
+	 * @return string classname.
 	 */
 	public static function get_registration_form_name() {
 		return self::$registrationFormName;
@@ -149,17 +151,17 @@ class RegisterDataPage_Controller extends Page_Controller {
 	/**
 	 * Get GeoNetwork base url.
 	 *
-	 * This method returns the base url to the OGC CSW catalogue (GeoNetwork). 
-	 * The url is stored in the page class {@see CataloguePage} because we 
-	 * might want to support multiple geonetwork nodes in one site, but each 
+	 * This method returns the base url to the OGC CSW catalogue (GeoNetwork).
+	 * The url is stored in the page class {@see CataloguePage} because we
+	 * might want to support multiple geonetwork nodes in one site, but each
 	 * accesses a different GeoNetwork node.
 	 *
 	 * @throws CataloguePage_Exception
- 	 * 
+ 	 *
 	 * @return string URL to the geonetwork node, i.e. "http://localhost:8080/geonetwork"
 	 */
 	public function getGeoNetworkBaseURL() {
-		
+
 		// get CataloguePage instance
 		$page = $this->data();
 		if (!isset($page)) throw new CataloguePage_Exception('Metadata Catalogue Page is not defined correctly.');
@@ -167,8 +169,8 @@ class RegisterDataPage_Controller extends Page_Controller {
 		// get GeoNetwork URL of that page.
 		$url = $page->GeonetworkBaseURL;
 		if (!isset($url) || $url == '') {
-			
-			// if this is a dev environment, use a local geonetwork (standard 
+
+			// if this is a dev environment, use a local geonetwork (standard
 			// development environment setup).
 			if (Director::isDev()) {
 				$url = 'http://192.168.1.136:8080/geonetwork';
@@ -179,17 +181,21 @@ class RegisterDataPage_Controller extends Page_Controller {
 		// return base-url to GeoNetwork node.
 		return $url;
 	}
-		
+
 	/**
 	 * Initialisation function that is run before any action on the controller is called.
 	 */
 	public function init() {
+		Requirements::javascript(THIRDPARTY_DIR . '/jquery/jquery.js');
+		Requirements::javascript(THIRDPARTY_DIR . '/jquery-ui/jquery-ui.js');
 		parent::init();
 		Requirements::javascript("geocatalogue/javascript/metadata_form.js");
 		Requirements::themedCSS('layout');
 		Requirements::themedCSS('typography');
 		Requirements::themedCSS('form');
-	}	
+
+		Requirements::css(THIRDPARTY_DIR . '/jquery-ui-themes/smoothness/jquery-ui.css');
+	}
 
 	public function index($data) {
 		$html = $this->render();
@@ -201,8 +207,8 @@ class RegisterDataPage_Controller extends Page_Controller {
 			"output-html" => true,
 			"hide-comments" => true
 		);
-		$tidy = tidy_parse_string($html, $options, 'utf8');		
-		tidy_clean_repair($tidy); 
+		$tidy = tidy_parse_string($html, $options, 'utf8');
+		tidy_clean_repair($tidy);
 		return tidy_get_output($tidy);
 	}
 
@@ -214,27 +220,27 @@ class RegisterDataPage_Controller extends Page_Controller {
 	function MetadataEntryForm() {
 		// create a registerForm (uses the static searchForm value)
 		$registerForm = self::get_registration_form_name();
-		
-		$form = new $registerForm($this,'MetadataEntryForm');		
-		
-		// 
-		
+
+		$form = new $registerForm($this,'MetadataEntryForm');
+
+		//
+
 		//SpamProtectorManager::update_form($form, null, array('Title', 'Content', 'Name', 'Website', 'Email'));
 		///SpamProtectorManager::update_form($form);
-		
+
 		return $form;
 	}
 
 	/**
 	 * Action: Register a new dataset.
 	 *
-	 * This action performs a geonetwork insert request to register a new 
+	 * This action performs a geonetwork insert request to register a new
 	 * metadata entry. It uses the GeoNetwork restful service API to pass
 	 * on the metadata details to the registered Metadata catalogue.
 	 *
 	 * @param array $data request data
 	 * @param form $form Form instance (registration form)
-	 * 
+	 *
 	 * @return void
 	 *
 	 * @todo add error message when geonetwork is down
@@ -244,39 +250,39 @@ class RegisterDataPage_Controller extends Page_Controller {
 
 		// for Session-Messages
 		$prefix=$this->prefixx();
-	
+
 		foreach($data as $key => $value) {
 			if ($key=="MDTopicCategory") continue; // Topic Category is an array of predefined values
 			$invalidText = '//]]>';
-      
+
 			if (!(strpos($value,$invalidText) === false)) {
 				$mess  = "Please ensure that the information you have entered does not contain the following<br /> text: '".$invalidText."'.<br />";
 				$mess .= "Unfortunately, this text segment can not be stored in the catalogue. ";
 
 				Session::set($prefix . ".errors.message", $mess);
 				Session::set($prefix . ".errors.messageType", 'Error');
-      
+
 
 				// optional: send email to admin?
 				$emailValues = array(
 					"SendEmailFrom" 	=> $this->data()->get_email_sender(),
 					"SendEmailTo" 		=> Email::getAdminEmail(),
-					"SendEmailSubject"	=> 'We encountered an exception' , 
+					"SendEmailSubject"	=> 'We encountered an exception' ,
 					"DetailsText" 		=> $mess,
 					"ExceptionText" 	=> '',
 				);
-			
+
 				$this->doSendEmailToAdministrator($emailValues,'ErrorEMail');
-        
+
 				return Director::redirectBack();
 			}
 		}
-		
+
 		$metadata = new MDMetadata();
 		$form->saveInto($metadata);
 		$metadata->MDLanguage = 'English';
 		$metadata->write();
-		
+
 		$scopeCodes=explode('||',$data['MDHierarchyLevelData']);
 		$scopeTypes=explode('||',$data['MDHierarchyLevelNameData']);
 
@@ -286,14 +292,14 @@ class RegisterDataPage_Controller extends Page_Controller {
 			$item->write();
 			$metadata->MDHierarchyLevel()->add($item);
 		}
-    
+
 		foreach ($scopeTypes as $type) {
 			$item=new MDHierarchyLevelName();
 			$item->Value=$type;
 			$item->write();
 			$metadata->MDHierarchyLevelName()->add($item);
 		}
- 		
+
 		for ($i=1;$i<4;$i++) {
 			if (!empty($data['MDDateTime'.$i])) {
 				$item=new MDCitationDate();
@@ -301,9 +307,9 @@ class RegisterDataPage_Controller extends Page_Controller {
 				$item->MDDateType = $data['MDDateType'.$i];
 				$item->write();
 				$metadata->MDCitationDates()->add($item);
-			}	
-		}	
-		
+			}
+		}
+
 		for ($i=1;$i<6;$i++) {
 			if (!empty($data['MDResourceFormatName'.$i])) {
 				$item=new MDResourceFormat();
@@ -311,8 +317,8 @@ class RegisterDataPage_Controller extends Page_Controller {
 				$item->Version = $data['MDResourceFormatVersion'.$i];
 				$item->write();
 				$metadata->MDResourceFormats()->add($item);
-			}	
-		}	
+			}
+		}
 
 		$urls = explode('||',$data['CIOnlineLinkageData']);
 
@@ -323,19 +329,19 @@ class RegisterDataPage_Controller extends Page_Controller {
 			$item->CIOnlineProtocol = 'WWW:LINK-1.0-http--link';
 			$item->write();
 			$metadata->CIOnlineResources()->add($item);
-		}	
-   
+		}
+
 		foreach ($data['MDTopicCategory'] as $category) {
 			$item=new MDTopicCategory();
 			$item->Value=$category;
 			$metadata->MDTopicCategory()->add($item);
 		}
-    
+
 
 		$contact = new MDContact();
 		$contact->write();
 		$form->saveInto($contact);
-		
+
 		$emails=explode('||',$data['MDElectronicMailAddressData']);
 		$phonenumbers=explode('||',$data['MDVoiceData']);
 
@@ -355,7 +361,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 		// foreach($contact->MDElectronicMailAddress() as $item) {
 		// 	Debug::show($item);
 		// }
-		// 
+		//
 		$contact->write();
 		$metadata->MDContacts()->add($contact);
 
@@ -372,34 +378,34 @@ class RegisterDataPage_Controller extends Page_Controller {
 		// generate GeoNetwork HTTP request (query metadata).
 		$cmd = $this->getCommand("GnCreateInsert", $data);
 		$request_params = $cmd->execute();
-			
+
 		$data = array(
 			'RequestParameter' => $request_params
 		);
 		$page = $this->data();
-    
+
 		$cmd = $this->getCommand("GnInsert", $data);
 		$cmd->setUsername($page->Username);
 		$cmd->setPassword($page->Password);
-		
+
 		$gnID = null;
-		
+
 		try {
-			$gnID = $cmd->execute();		
+			$gnID = $cmd->execute();
 		}
 		catch(GeoNetworkRestfulService_Exception $exception) {
 			// add error message
 			$mess= 'Unfortunately the registration process failed due to a technical problem. Please retry later. ';
 			$mess.=$exception->getMessage();
-			
+
 			Session::set($prefix . ".errors.message", $mess);
 			Session::set($prefix . ".errors.messageType", 'Error');
-			
+
 			// optional: send email to admin?
 			$emailValues = array(
 				"SendEmailFrom" 	=> $this->data()->get_email_sender(),
 				"SendEmailTo" 		=> Email::getAdminEmail(),
-				"SendEmailSubject"	=> 'We encountered an exception' , 
+				"SendEmailSubject"	=> 'We encountered an exception' ,
 				"DetailsText" 		=> 'While doing a "GnInsert" we caught the following "GeoNetworkRestfulService_Exception" exception:',
 				"ExceptionText" 	=> $exception->getMessage(),
 			);
@@ -414,25 +420,25 @@ class RegisterDataPage_Controller extends Page_Controller {
 			//Session::setFormMessage($prefix, $mess, 'Error');	// Info , Notice, Warning, Error or something like that
 			Session::set($prefix . ".errors.message", $mess);
 			Session::set($prefix . ".errors.messageType", 'Error');
-			
+
 			// optional: send email to admin?
 			$emailValues = array(
 				"SendEmailFrom" 	=> $this->data()->get_email_sender(),
 				"SendEmailTo" 		=> Email::getAdminEmail(),
-				"SendEmailSubject"	=> 'We encountered an exception' , 
+				"SendEmailSubject"	=> 'We encountered an exception' ,
 				"DetailsText" 		=> 'While doing a "GnInsert" we caught the following "GeonetworkInsertCommand_Exception" exception:',
 				"ExceptionText" 	=> $exception->getMessage(),
 			);
 			$this->doSendEmailToAdministrator($emailValues,'ErrorEMail');
 			return Director::redirectBack();
 		}
-		
+
 		$uuid = $cmd->get_uuid();
 
 		$metadata->gnID           = $gnID;
 		$metadata->fileIdentifier = $uuid;
 		$metadata->write();
-				
+
 		$page = $this->data();
 		if (!isset($page)) {
 			throw new CataloguePage_Exception('Metadata Catalogue Page is not defined correctly.');
@@ -440,44 +446,44 @@ class RegisterDataPage_Controller extends Page_Controller {
 
 		// get GeoNetwork URL of that page.
 		$url = $page->RedirectOnSuccess;
-		
+
 		$baseURLParts = explode('/' , $this->AbsoluteLink());
 		if(array_pop($baseURLParts) == ''){
 			//if it's empty, we had a slash at the end and have to remove the controllername
 			//again ;0)
 			array_pop($baseURLParts);
 		}
-		
-		$absoluteURLToDetails = implode('/',$baseURLParts)."/".$url."/dogetrecordbyid/".$uuid ; 
-		
+
+		$absoluteURLToDetails = implode('/',$baseURLParts)."/".$url."/dogetrecordbyid/".$uuid ;
+
 		$nameWhoGetsTheEmail = $page->EmailName;
 		if($nameWhoGetsTheEmail == '') $nameWhoGetsTheEmail='Administrator';
 		// prepare email sending
 		$emailValues = array(
 			"emailName" 		=> $nameWhoGetsTheEmail,
 			"SendEmailFrom" 	=> $page->get_email_sender(),
-			"SendEmailTo" 		=> $page->SendConfitmationsTo, 
-			"SendEmailSubject"	=> 'Metadata Catalogue: New submission from '. $contact->MDElectronicMailAddress, 
+			"SendEmailTo" 		=> $page->SendConfitmationsTo,
+			"SendEmailSubject"	=> 'Metadata Catalogue: New submission from '. $contact->MDElectronicMailAddress,
 			"detailsURL" 		=> $absoluteURLToDetails,
 			"submittedEmail" 	=> $contact->MDElectronicMailAddress,
 			"submittedTitle"   	=> $metadata->MDTitle,
 			"submittedAbstract"	=> substr($metadata->MDAbstract,0,500),
 		);
-		
-				
+
+
 		$successfulySentEmail=$this->doSendEmailToAdministrator($emailValues,'ConfirmationEMail');
-		
+
 		$refe = $page->URLSegment ;
 		if($refe == ''){
 			$refe='javascript:history.back(2)';
 		}
 		$messageObj = new ViewableData();
 		$customFields = array('TakeMeBackTo'=> $refe);
-		
+
 		$messageObj->customise($customFields);
 
-		$mess = $messageObj->renderWith('ConfirmationMessage');		
-		
+		$mess = $messageObj->renderWith('ConfirmationMessage');
+
 		$prefix="FormInfo." . $page->RedirectOnSuccess;
 		Session::set($prefix . ".info.message", $mess);
 		Session::set($prefix . ".info.messageType", 'ThankYou');
@@ -490,19 +496,19 @@ class RegisterDataPage_Controller extends Page_Controller {
 	 * @param 	array $values is used for rendering the email via $template
 	 *			and some fields for the email itself, which are:
 	 *			'SendEmailSubject' is the subject of the mail and defaults to $template
-	 *			'SendEmailFrom' is the email address shown in the FROM field of the email defaults to the 
+	 *			'SendEmailFrom' is the email address shown in the FROM field of the email defaults to the
 	 *							admin email-address of the silverstripe installation
 	 *  		'SendEmailTo' is the email-address where the mail is sended to (mandatory)
 	 * @param	string $template is the name of the template to be used for rendering the email
-	 *			
-	 * @return 	boolean true on success, otherwise false 
+	 *
+	 * @return 	boolean true on success, otherwise false
 	 */
 	function doSendEmailToAdministrator($customFields, $templateName='ConfirmationEMail'){
 		//checks
 		if(! isset($customFields['SendEmailSubject']) || $customFields['SendEmailSubject'] == ""){
 			$customFields['SendEmailSubject'] = $templateName;
 		}
-		
+
 		$emailObj = new ViewableData();
 		$emailObj->customise($customFields);
 
@@ -512,14 +518,14 @@ class RegisterDataPage_Controller extends Page_Controller {
 		// Send an email to the administrator
 		$email = new Email(
 			$customFields['SendEmailFrom'],
-			$customFields['SendEmailTo'], 
-			$customFields['SendEmailSubject'], 
+			$customFields['SendEmailTo'],
+			$customFields['SendEmailSubject'],
 			$emailText
 		);
 		return $email->send();
-			
+
 	}
-	
+
 	/**
 	*  getTheSessionMessage()
 	*
@@ -528,7 +534,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 	* @return string The Session-Message
 	*				or empty string if there's none
 	*/
-	
+
 	public function getTheSessionMessage(){
 		$formerrors=Session::get($this->prefixx() . '.errors');
 		$message='';
@@ -547,13 +553,13 @@ class RegisterDataPage_Controller extends Page_Controller {
 	/**
 	*  getTheSessionMessageType()
 	*
-	* Returns the first Session-Error-MessageType  for the given page 
+	* Returns the first Session-Error-MessageType  for the given page
 	* The Session-Message-Type can be 'Info','Warning','Error' or 'Validation'
 	*
 	* @return string The Session-Message-Type
 	*				or empty string if there's none
 	*/
-	
+
 	public function getTheSessionMessageType(){
 		$formerrors=Session::get($this->prefixx() . '.errors');
 		$type='';
@@ -567,11 +573,11 @@ class RegisterDataPage_Controller extends Page_Controller {
 		}
 		return $type;
 	}
-	
+
 	/**
 	*  clearTheSessionMessage()
 	*
-	* Clears all the Session-Errors for the given page 
+	* Clears all the Session-Errors for the given page
 	*
 	*/
 
@@ -579,7 +585,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 		$prefix=$this->prefixx();
 		Session::clear($prefix .'.errors');
 	}
-	
+
 	/**
 	*  prefixx()
 	*
@@ -588,7 +594,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 	*
 	* @return string The prefix
 	*/
-	
+
 	protected function prefixx(){
 		$form=$this->MetadataEntryForm();
 		$formname=$form->FormName();
@@ -611,7 +617,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 	*
 	* @return string options
 	*/
-	
+
 	public function getTLAfor($httpRequest){
 		$params = $httpRequest->allParams();
 		if (!isset($params['ID'])) {
@@ -621,6 +627,7 @@ class RegisterDataPage_Controller extends Page_Controller {
 			$params['ID']=$params['ID'];
 		}
 		$TLAs=NewZealandPlaces::get_nztla($params['ID']);
+
 		$output='';
 		//<option value="172.6298219;174.3497666;-35.67495409;-34.38541495">Far North District</option>
 		while (list($key, $val) = each($TLAs)) {
@@ -629,5 +636,5 @@ class RegisterDataPage_Controller extends Page_Controller {
 		print_r($output);
 		return ;
 	}
-	
+
 }
