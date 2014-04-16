@@ -20,20 +20,6 @@ class GnCreateInsertCommand extends ControllerCommand {
 	
 	static $gn_group = "3";
 
-	static function implode_with_keys($data) {
-	    $first = true;
-	    $output = '';
-	    foreach($data as $key => $value) {
-	        if ($first) {
-	            $output = ''.$key.'='.urlencode($value);
-	            $first = false;
-	        } else {
-	            $output .= '&'.$key.'='.$value;   
-	        }
-	    }
-	    return $output;
-	}
-
 	/**
 	 * Command execute
 	 *
@@ -44,10 +30,15 @@ class GnCreateInsertCommand extends ControllerCommand {
 	public function execute() {
 		$data = $this->getParameters();
 
-		// generate xml file
-		$cmd = $this->getController()->getCommand(self::$schema_name, $data);
+		$xml = '';
 
-		$xml = $cmd->execute(); 
+		// If xml field is not set, generate xml file out of the MD Metadata object.
+		if (!isset($data['xml'])) {
+			$cmd = $this->getController()->getCommand(self::$schema_name, $data);
+			$xml = $cmd->execute();
+		} else {
+			$xml = $data['xml'];
+		}
 
 		$data = array();
 		$data['data']       = $xml;
@@ -62,4 +53,22 @@ class GnCreateInsertCommand extends ControllerCommand {
 		return $data;		
 	}
 
+	/**
+	 * @param $data
+	 *
+	 * @return string
+	 */
+	static function implode_with_keys($data) {
+	    $first = true;
+	    $output = '';
+	    foreach($data as $key => $value) {
+	        if ($first) {
+	            $output = ''.$key.'='.urlencode($value);
+	            $first = false;
+	        } else {
+	            $output .= '&'.$key.'='.$value;
+	        }
+	    }
+	    return $output;
+	}
 }
