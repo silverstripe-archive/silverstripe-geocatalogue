@@ -481,15 +481,31 @@ class CataloguePage_Controller extends Page_Controller {
 		$xpath = new DOMXPath($doc);
 		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
 
-		$responseDOM = $xpath->query('/csw:GetRecordByIdResponse');
-		$searchResultItem = $responseDOM->item(0);
+		$rootNodeList = $xpath->query("/");
+		if ($rootNodeList->length > 0) {
+			$rootNodeItem = $rootNodeList->item(0);
 
-		foreach($searchResultItem->childNodes as $child) {
-			if($child->nodeType == XML_ELEMENT_NODE) {
-				if($child->nodeName == 'mcp:MD_Metadata') {
+			// check if the XML document is a response from GeoNetwork
+			$responseDOM = $xpath->query('csw:GetRecordByIdResponse',$rootNodeItem);
+			if ($responseDOM->length > 0) {
+				$searchResultItem = $responseDOM->item(0);
+
+				foreach($searchResultItem->childNodes as $child) {
+					if($child->nodeType == XML_ELEMENT_NODE) {
+						if($child->nodeName == 'mcp:MD_Metadata') {
+							$format = 'mcp';
+						}
+						else if($child->nodeName == 'gmd:MD_Metadata') {
+							$format = 'anzlic';
+						}
+					}
+				}
+			} else {
+				// check if the XML document is a plain Metadata profile XML Document
+				if($rootNodeItem->nodeName == 'mcp:MD_Metadata') {
 					$format = 'mcp';
 				}
-				else if($child->nodeName == 'gmd:MD_Metadata') {
+				elseif($rootNodeItem->nodeName == 'gmd:MD_Metadata') {
 					$format = 'anzlic';
 				}
 			}
