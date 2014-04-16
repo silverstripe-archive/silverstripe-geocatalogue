@@ -69,35 +69,29 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 		$data['_1_1']      = "on";
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
-		$headers     = array('Content-Type: application/x-www-form-urlencoded');		
+		$headers     = array('Content-Type: application/x-www-form-urlencoded');
 		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);	
-
 		// @todo better error handling
 		$responseXML = $response->getBody();
 
-		// parse catalogue response
-		$data = array(
-			'xml' => $responseXML,
-			'xsl' => self::get_xsl_path()
-		);
+        // read GeoNetwork ID from the response-XML document
+        $doc  = new DOMDocument();
+        $doc->loadXML($responseXML);
+		$xpath = new DOMXPath($doc);
 
-		$cmd = $this->getController()->getCommand("TranslateXML", $data);
-		$xml = $cmd->execute();
-	
-		$id   = $gnID;
-		$gnID = null;
-		
-		// toDo: bad! use JSON
-		eval(trim($xml));
-		
-		if (!isset($gnID)) {
+        $idList = $xpath->query('/response/id');
+		$response_gnID = null;
+		if ($idList->length > 0) {
+			$response_gnID = $idList->item(0)->nodeValue;
+		}
+
+		if (!isset($response_gnID)) {
 			throw new GnPublishMetadataCommand_Exception('GeoNetwork ID for the new dataset has not been created.');
 		}
-		
-		if ($gnID != $id) {
+		if ($gnID != $response_gnID) {
 			throw new GnPublishMetadataCommand_Exception('GeoNetwork publication has failed.');
 		}
-		return $gnID;		
+		return $gnID;
 	}
 
 }

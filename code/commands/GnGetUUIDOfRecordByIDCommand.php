@@ -57,7 +57,7 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		$data       = $this->getParameters();
 		
 		$id = $data['gnID'];
-		
+
 		try {
 			$this->restfulService = new GeoNetworkRestfulService($this->getController()->getGeoNetworkBaseURL(),0);
 			
@@ -81,27 +81,25 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		// @todo better error handling
 		$responseXML = $response->getBody();
 
-		// parse catalogue response
-		$data = array(
-			'xml' => $responseXML,
-			'xsl' => self::get_xsl_path()
-		);
+		$fileIdentifier = null;
 
-		$cmd = $this->getController()->getCommand("ParseXML", $data);
-		$result = $cmd->execute();
+		$doc  = new DOMDocument();
+		$doc->loadXML($responseXML);
 
-		// render metadata data-structure
-		$SearchRecord = $result->__get('Items');
-		
-		if ($SearchRecord->TotalItems() != 1) {
-			throw new GnGetUUIDOfRecordByIDCommand_Exception('Unexpected GeoNetwork response. Can not locate or identify the UUID of the provided dataset.');
+		$xpath = new DOMXPath($doc);
+		$xpath->registerNamespace("gmd", "http://www.isotc211.org/2005/gmd");
+		$xpath->registerNamespace("gco", "http://www.isotc211.org/2005/gco");
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+
+		$metadataList = $xpath->query('/gmd:MD_Metadata');
+		foreach($metadataList as $metadata) {
+			$list = $xpath->query('gmd:fileIdentifier/gco:CharacterString',$metadata);
+			if ($list->length > 0) {
+				$fileIdentifier = $list->item(0)->nodeValue;
+			}
 		}
-		$metadata = $SearchRecord->First();
-		
-		$uuid = $metadata->fileIdentifier;
-		return $uuid;		
+		return $fileIdentifier;
 	}
-	
 }
 
 /**

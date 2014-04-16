@@ -101,22 +101,18 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		if ( strpos($responseXML, "<html>" ) === 0 ) {
 			if ( strpos($responseXML, "Duplicate entry" ) != false ) throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',101);
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',100);
-		}
-		
-		// parse catalogue response
-		$translateData = array(
-			'xml' => $responseXML,
-			'xsl' => '../geocatalogue/xslt/gnInsertResponse.xsl',
-		);
 
-		$cmd = $this->getController()->getCommand("TranslateXML", $translateData);
-		$xml = $cmd->execute();
+        // read GeoNetwork ID from the response-XML document
+        $doc  = new DOMDocument();
+        $doc->loadXML($responseXML);
+		$xpath = new DOMXPath($doc);
 
+        $idList = $xpath->query('/response/id');
 		$gnID = null;
-		
-		// toDo: bad! use JSON
-		eval(trim($xml));
-		
+		if ($idList->length > 0) {
+			$gnID = $idList->item(0)->nodeValue;
+		}
+
 		if (!isset($gnID)) {
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork ID for the new dataset has not been created.');
 		}
