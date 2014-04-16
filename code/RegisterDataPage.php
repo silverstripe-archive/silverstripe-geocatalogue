@@ -265,10 +265,8 @@ class RegisterDataPage_Controller extends Page_Controller
 		if($jsReference == '') {
 			$jsReference = 'javascript:history.back(2)';
 		}
-		$customFields = array('href_back' => $jsReference);
-
 		$messageObj = new ViewableData();
-		$messageObj->customise($customFields);
+		$messageObj->customise(array('href_back' => $jsReference));
 		$messageHTML = $messageObj->renderWith('ConfirmationMessage');
 
 		$prefix = "FormInfo." . $page->RedirectOnSuccess;
@@ -276,7 +274,7 @@ class RegisterDataPage_Controller extends Page_Controller
 		Session::set($prefix . ".info.message", $messageHTML);
 		Session::set($prefix . ".info.messageType", 'ThankYou');
 
-		$this->redirect($page->RedirectOnSuccess . "/dogetrecordbyid/" . $metadata->fileIdentifier);
+		$this->redirect($page->RedirectOnSuccess . "/dogetrecordbyid/".$metadata->fileIdentifier);
 		return;
 	}
 
