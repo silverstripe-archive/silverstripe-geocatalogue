@@ -12,6 +12,8 @@ Catalogue:
 
   'site_status': 'setup'
 
+  'automatic_publishing': false
+
   standard_definitions:
     iso:
       'name': 'ISO19139'

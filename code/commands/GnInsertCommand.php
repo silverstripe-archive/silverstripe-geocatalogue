@@ -12,16 +12,13 @@
 class GnInsertCommand extends GnAuthenticationCommand {
 
 	static $api_url = 'srv/en/xml.metadata.insert';
-	
-	static $automatic_publishing = false;
-	
+
 	private $gnID = null;
 
 	private $uuid = null;
 
 	/**
 	 * Returns the UUID of the new metadata record.
-	 *
 	 * @return string
 	 */
 	public function get_uuid() {
@@ -30,19 +27,14 @@ class GnInsertCommand extends GnAuthenticationCommand {
 	
 	/**
 	 * Returns the GeoNetwork internal ID of the new metadata record.
-	 *
 	 * @return int
 	 */
 	public function get_gnid() {
 		return $this->gnID;
 	}
 	
-	public static function get_automatic_publishing() {
-		return self::$automatic_publishing;
-	}
-
-	public static function set_automatic_publishing($automatic_publishing) {
-		self::$automatic_publishing = $automatic_publishing;
+	public function get_automatic_publishing() {
+		return Config::inst()->get('Catalogue', 'automatic_publishing');
 	}
 
 	/**
@@ -146,7 +138,6 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		// return the geonetwork id of the new entry.
 		return $gnID;		
 	}
-
 }
 
 /**
