@@ -88,19 +88,19 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		// insert metadata into GeoNetwork
 		$headers = array('Content-Type: application/x-www-form-urlencoded');
 
-		$response    = $this->restfulService->request(self::$api_url,'POST',$params, $headers);	
+		$response    = $this->restfulService->request(self::$api_url,'POST',$params, $headers);
 		$responseXML = $response->getBody();
 
-		// We expect a status code of 200 for the insert/getrecords and
-		// getrecordsbyid requests.
+		// We expect a status code of 200 for the insert/getrecords and getrecordsbyid requests.
 		if ($response->getStatusCode() != 200) {
 			throw new GeonetworkInsertCommand_Exception('HTTP request return following response code:'.$response->getStatusCode());
 		}
-		
+
 		// because we use the Geonetwork API, the error message are returned as HTML page.
 		if ( strpos($responseXML, "<html>" ) === 0 ) {
 			if ( strpos($responseXML, "Duplicate entry" ) != false ) throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',101);
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',100);
+		}
 
         // read GeoNetwork ID from the response-XML document
         $doc  = new DOMDocument();
@@ -132,13 +132,13 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		if (!isset($uuid)) {
 			throw new GeonetworkInsertCommand_Exception("New metadata record has been created, but GeoNetwork can not provide the UUID for the new record."); 
 		}
-		
+
 		// generate update GeoNetwork HTTP request (query metadata).
 		if ($this->get_automatic_publishing()) {
-			$cmd = $this->getController()->getCommand("GnPublishMetadata", $data);
+			$cmd = $this->getController()->getCommand("GnPublishmetadata", $data);
 			$cmd->setUsername($page->Username);
 			$cmd->setPassword($page->Password);	
-			$xml = $cmd->execute();
+			$cmd->execute();
 		}
 		$this->gnID = $gnID;
 		$this->uuid = $uuid;
