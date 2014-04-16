@@ -498,6 +498,19 @@ class CataloguePage_Controller extends Page_Controller {
 		return $format;
 	}
 
+	public function getTheSessionMessage() {
+		return Session::get("FormInfo." . $this->URLSegment . ".info.message");
+	}
+
+	public function getTheSessionMessageType() {
+		return Session::get("FormInfo." . $this->URLSegment . ".info.messageType");
+	}
+
+	public function clearTheSessionMessage() {
+		Session::clear("FormInfo." . $this->URLSegment . ".info.message");
+		Session::clear("FormInfo." . $this->URLSegment . ".info.messageType");
+	}
+
 }
 
 /**
