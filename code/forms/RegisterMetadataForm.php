@@ -145,7 +145,7 @@ class RegisterMetadataForm extends Form {
 		
 		if(!$actions) {
 	      $actions = new FieldList(
-	         new FormAction('doRegisterMetadata', 'Submit')
+				FormAction::create("doRegisterMetadata")->setTitle("Submit")
 	      );
 		}
 		
@@ -155,9 +155,6 @@ class RegisterMetadataForm extends Form {
 			            'MDTitle', 'MDAbstract', 'MDElectronicMailAddress', 'MDDateTime', 'MDTopicCategory'
 			        );
 		}
-		
-//		$validator->setJavascriptValidationHandler('none');
-		
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 	}
 	
@@ -167,5 +164,4 @@ class RegisterMetadataForm extends Form {
 			'Form'
 		));
 	}
-
 }
