@@ -50,7 +50,10 @@ class MDCitationDate extends MDDataObject {
 			$result =  '';
 		} else {	
 			// strtotime doesn't like british dates so we reverse it first
-			$dateParts=explode('/',$date);	
+			$tempDate= $date;
+			// expected format by jQuery-UI datepicker: '2014-02-04 00:00:00'
+			$dateParts=explode(' ',$tempDate);
+			$dateParts=explode('-',$dateParts[0]);
 			$date = $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0]; 
 			$result = date('c', strtotime($date));
 		}
