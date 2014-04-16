@@ -138,7 +138,7 @@ class CataloguePage_Controller extends Page_Controller {
 
         $format = Config::inst()->get('Catalogue', 'metadata_standard');
 
-        if (!$this->validateRequestFormat($format)) {
+        if (!self::validateRequestFormat($format)) {
             throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
         }
 
@@ -163,6 +163,7 @@ class CataloguePage_Controller extends Page_Controller {
                       'bboxUpper' => $query->get('bboxUpper'),
                       'bboxLower' => $query->get('bboxLower')
         );
+
 
         try {
             $cmd = $this->getCommand("GetRecords", $data);
@@ -267,19 +268,17 @@ class CataloguePage_Controller extends Page_Controller {
 
         // parse XML response and create the SilverStripe data-structure.
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
-	    $format = $this->getFormat($responseXML);
+	    $format = self::getFormat($responseXML);
 
-		if (!$this->validateRequestFormat($format)) {
+		if (!self::validateRequestFormat($format)) {
 			throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
 		}
 
         $data = array('xml' => $responseXML);
 
-        $classname = $standards[$format]['full_response'];
-        $cmd = $this->getCommand($classname, $data);
+        $cmd = $this->getCommand($standards[$format]['full_response'], $data);
 
         $result = $cmd->execute();
-        // echo('<pre>'); print_r($result);echo('<pre>');
 
         // render metadata data-structure
         $this->data()->result_item = $result->__get('Items');
@@ -292,7 +291,7 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $format
      * @return bool
      */
-    private function validateRequestFormat($format) {
+    public static function validateRequestFormat($format) {
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
         return isset($standards[$format]);
     }
@@ -473,7 +472,7 @@ class CataloguePage_Controller extends Page_Controller {
 	 *
 	 * @return string
 	 */
-	protected function getFormat($responseXML) {
+	public static function getFormat($responseXML) {
 		$format = Config::inst()->get('Catalogue', 'metadata_standard');
 
 		$doc = new DOMDocument();
