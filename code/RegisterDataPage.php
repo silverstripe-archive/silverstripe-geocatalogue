@@ -204,12 +204,7 @@ class RegisterDataPage_Controller extends Page_Controller
 				$message .= "Unfortunately, this text segment can not be stored in the catalogue. ";
 				$form->sessionMessage($message, 'bad');
 
-				// optional: send email to admin?
-				$emailValues = array("SendEmailFrom" => $this->data()->get_email_sender(),
-				                     "SendEmailTo" => Config::inst()->get('Email', 'admin_email'),
-				                     "SendEmailSubject" => 'We encountered an exception',
-				                     "DetailsText" => $message,
-				                     "ExceptionText" => '',);
+				$emailValues = $this->generateEmailTemplateValues($message, $exception->getMessage());
 				$this->sendEmail($emailValues, 'ErrorEMail');
 
 				$this->redirectBack();
@@ -238,12 +233,7 @@ class RegisterDataPage_Controller extends Page_Controller
 			$message .= $exception->getMessage();
 			$form->sessionMessage($message, 'bad');
 
-			// optional: send email to admin?
-			$emailValues = array("SendEmailFrom" => $this->data()->get_email_sender(),
-			                     "SendEmailTo" => Config::inst()->get('Email', 'admin_email'),
-			                     "SendEmailSubject" => 'We encountered an exception',
-			                     "DetailsText" => 'While doing a "GnInsert" we caught the following "GeoNetworkRestfulService_Exception" exception:',
-			                     "ExceptionText" => $exception->getMessage());
+			$emailValues = $this->generateEmailTemplateValues('', $exception->getMessage());
 			$this->sendEmail($emailValues, 'ErrorEMail');
 
 			$this->redirectBack();
@@ -255,12 +245,7 @@ class RegisterDataPage_Controller extends Page_Controller
 			$message .= $exception->getMessage();
 			$form->sessionMessage($message, 'bad');
 
-			// optional: send email to admin?
-			$emailValues = array("SendEmailFrom" => $this->data()->get_email_sender(),
-			                     "SendEmailTo" => Config::inst()->get('Email', 'admin_email'),
-			                     "SendEmailSubject" => 'We encountered an exception',
-			                     "DetailsText" => 'While doing a "GnInsert" we caught the following "GeonetworkInsertCommand_Exception" exception:',
-			                     "ExceptionText" => $exception->getMessage());
+			$emailValues = $this->generateEmailTemplateValues('', $exception->getMessage());
 			$this->sendEmail($emailValues, 'ErrorEMail');
 
 			$this->redirectBack();
@@ -294,6 +279,27 @@ class RegisterDataPage_Controller extends Page_Controller
 		$this->redirect($page->RedirectOnSuccess . "/dogetrecordbyid/" . $metadata->fileIdentifier);
 		return;
 	}
+
+	/**
+	 * Generate variables for exceptions email template
+	 * @param string $exceptionMsg
+	 *
+	 * @return array
+	 */
+	function generateEmailTemplateValues($text = '', $exceptionMsg = 'Something went wrong'){
+		if ($text == '') {
+			$text = 'While doing a "GnInsert" we caught the following "GeoNetworkRestfulService_Exception" exception:';
+		}
+
+		return $emailValues = array(
+			"SendEmailFrom" 	=> $this->data()->get_email_sender(),
+			"SendEmailTo" 		=> Config::inst()->get('Email', 'admin_email'),
+			"SendEmailSubject"	=> 'We encountered an exception' ,
+			"DetailsText" 		=> $text,
+			"ExceptionText" 	=> $exceptionMsg
+		);
+	}
+
 
 	/**
 	 *  prefixx()
