@@ -16,12 +16,17 @@ class ParseXML2ANZLICCommand extends ParseXMLCommand {
         $mdArray = array();
 
         $xpath = new DOMXPath($doc);
-//        $xpath->registerNamespace("mcp", "http://bluenet3.antcrc.utas.edu.au/mcp");
         $xpath->registerNamespace("gmd", "http://www.isotc211.org/2005/gmd");
         $xpath->registerNamespace("gco", "http://www.isotc211.org/2005/gco");
         $xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
 
         $metadataList = $xpath->query('gmd:MD_Metadata');
+
+	    // In case Geonetwork document does not provide a XML envelope, check if the metadata node is a root node.
+	    // Used when the website visitor uploads a XML file
+	    if ($metadataList->length == 0) {
+		    $metadataList = $xpath->query('/gmd:MD_Metadata');
+	    }
         foreach($metadataList as $metadata) {
             $mdItem = array();
             if ($xpath->query('gmd:fileIdentifier/gco:CharacterString',$metadata)->length > 0) {
