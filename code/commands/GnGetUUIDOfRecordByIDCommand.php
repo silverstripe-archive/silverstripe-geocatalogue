@@ -66,9 +66,8 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 				$this->restfulService->setPassword($this->getPassword());
 				$this->restfulService->setRequireAuthentication(true);
 			}
-
 		}
-		catch (CataloguePage_Exception $e) {
+		catch (GeoNetworkRestfulService_Exception $e) {
 			throw new GnGetUUIDOfRecordByIDCommand_Exception($e->getMessage());
 		}
 		
