@@ -80,7 +80,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 				$this->restfulService->setRequireAuthentication(true);
 			}
 		}
-		catch (CataloguePage_Exception $e) {
+		catch (GeoNetworkRestfulService_Exception $e) {
 			throw new GeonetworkInsertCommand_Exception($e->getMessage());
 		}
 		
