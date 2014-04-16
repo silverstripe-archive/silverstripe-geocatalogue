@@ -16,7 +16,7 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 	static $api_url = 'srv/en/metadata.admin';
 	static $RequireAuth = true;
 
-	static $xsl_path = '../geocatalogue/xslt/gnInsertResponse.xsl';
+//	static $xsl_path = '../geocatalogue/xslt/gnInsertResponse.xsl';
 
 	static function get_api_url() {
 		return self::$api_url;
@@ -26,13 +26,13 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 		self::$api_url = $value;
 	}
 
-	static function get_xsl_path() {
-		return self::$xsl_path;
-	}
-	
-	static function set_xsl_path( $xsl_path ) {
-		self::$xsl_path = $xsl_path;
-	}
+//	static function get_xsl_path() {
+//		return self::$xsl_path;
+//	}
+//
+//	static function set_xsl_path( $xsl_path ) {
+//		self::$xsl_path = $xsl_path;
+//	}
 	
 	/**
 	 * Command execute

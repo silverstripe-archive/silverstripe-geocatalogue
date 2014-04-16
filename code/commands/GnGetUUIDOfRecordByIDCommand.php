@@ -20,7 +20,7 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 	
 	static $RequireAuth = true;
 
-	static $xsl_path = '../geocatalogue/xslt/gnParseUUID.xsl';
+//	static $xsl_path = '../geocatalogue/xslt/gnParseUUID.xsl';
 
 	private $username = '';
 	
@@ -34,13 +34,13 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		self::$api_url = $value;
 	}
 
-	static function get_xsl_path() {
-		return self::$xsl_path;
-	}
-	
-	static function set_xsl_path( $xsl_path ) {
-		self::$xsl_path = $xsl_path;
-	}
+//	static function get_xsl_path() {
+//		return self::$xsl_path;
+//	}
+//
+//	static function set_xsl_path( $xsl_path ) {
+//		self::$xsl_path = $xsl_path;
+//	}
 	
 	/**
 	 * Command execute
