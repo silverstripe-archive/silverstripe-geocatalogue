@@ -31,7 +31,7 @@ class GenerateISO19139XMLCommand extends ControllerCommand {
 		
 		$MDMetadata = $data['MDMetadata'];
 		
-		if(! is_a($MDMetadata,'MDMetadata')){
+		if(!is_a($MDMetadata,'MDMetadata')){
 			throw new GenerateISO19139XMLCommand_Exception("data-object is not a MDMetadata");
 		}
 		

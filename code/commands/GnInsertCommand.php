@@ -54,6 +54,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		
 		$controller = Controller::curr();
 		$cookie_filename = TEMP_FOLDER."/gncookie.txt";
+
 		// get GeoNetwork Page type
 		$page = $controller->data();
 		if ($page == null) {
@@ -109,8 +110,6 @@ class GnInsertCommand extends GnAuthenticationCommand {
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork ID for the new dataset has not been created.');
 		}
 
-		// store gnid alongside with MDMetadata?
-
 		// update metadata record and send an update to add the UUID to the record.
 		$data = $this->getParameters();
 		$data['gnID'] = $gnID;
@@ -120,7 +119,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		$cmd->setPassword($page->Password);	
 		
 		$uuid = $cmd->execute();
-		
+
 		if (!isset($uuid)) {
 			throw new GeonetworkInsertCommand_Exception("New metadata record has been created, but GeoNetwork can not provide the UUID for the new record."); 
 		}

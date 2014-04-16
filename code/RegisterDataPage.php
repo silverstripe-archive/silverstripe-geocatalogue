@@ -107,6 +107,7 @@ class RegisterDataPage_Controller extends Page_Controller
 	 * @var String
 	 */
 	public static $registrationFormName = "RegisterMetadataForm";
+
 	private static $allowed_actions = array('getTLAfor','doRegisterMetadata', 'RegisterMetadataForm','MetadataEntryForm');
 
 	/**
@@ -344,7 +345,7 @@ class RegisterDataPage_Controller extends Page_Controller
 	 * @return bool
 	 */
 	function sendEmail($customFields, $templateName = 'ConfirmationEMail') {
-		//checks
+
 		if(!isset($customFields['SendEmailSubject']) || $customFields['SendEmailSubject'] == "") {
 			$customFields['SendEmailSubject'] = $templateName;
 		}
@@ -518,6 +519,7 @@ class RegisterDataPage_Controller extends Page_Controller
 	 * @param $metadata
 	 */
 	public function sendConfirmationEmail($metadata) {
+
 		// get GeoNetwork URL of that page.
 		$url = $this->data()->RedirectOnSuccess;
 		$uuid = $metadata->fileIdentifier;

@@ -76,7 +76,6 @@ class ParseXMLCommand extends ControllerCommand {
 	 * @return ViewableData
 	 */
 	public function parseXML($responseXML) {
-
 		$responseXML = str_replace("'","\'",$responseXML);
 
         // parsing
