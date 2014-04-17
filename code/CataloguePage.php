@@ -42,10 +42,24 @@ class CataloguePage extends Page {
 
         Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 
-        $fields->addFieldsToTab('Root.Catalog', array(new TextField('GeonetworkBaseURL', 'The base URL of the GeoNetwork-Server you want to connect to:'),
-                                                      new TextField('GeonetworkUsername', 'GeoNetwork username'),
-                                                      new PasswordField('GeonetworkPassword', 'Geonetwork password'),
-                                                      new TextField('ResultsPerSearchPage', 'How many results per page (1 .. 99):')));
+
+        $fields->addFieldsToTab('Root.Catalog', array(
+	        $gnfields = new CompositeField(array(
+	   						$url = new TextField('GeonetworkBaseURL', 'URL'),
+	   						$user = new TextField('Username','Username'),
+	   						$pass = new PasswordField('Password','Password'),
+						    $results = new TextField('ResultsPerSearchPage', 'Results per page:'
+	   		)))
+        ));
+
+		$gnfields->setTag('fieldset');
+		$gnfields->setLegend('<h3>GeoNetwork Configurations</h3>');
+
+		$url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
+		$user->setDescription('Geonetwork user name.');
+		$pass->setDescription('Geonetwork password.');
+	    $results->setDescription('Define how many results per page shell be shown (1 .. 99).');
+
 
         if (CataloguePage::get_site_status() != 'setup') {
             $fields->makeFieldReadonly('GeonetworkBaseURL');

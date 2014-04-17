@@ -53,24 +53,34 @@ class RegisterDataPage extends Page
 		$pagesSearch = CatalogueHomePage::get_page_subclasses('CataloguePage');
 
 		// customise form fields
-		$fields->addFieldsToTab('Root.Catalogue', array(new TextField('GeonetworkBaseURL', 'The base URL of the GeoNetwork-Server you want to connect to:'),
-		                                                new EmailField('SendConfitmationsTo', 'Notify this email address of new submissions'),
-		                                                new TextField('EmailName', 'The name of the person who receives the notification'),
-		                                                new TextField('Username', 'GeoNetwork username'),
-		                                                new PasswordField('Password', 'Geonetwork password'),
-		                                                new DropdownField('RedirectOnSuccess', 'page (url-segment) to redirect the user after a successful submission")', $pagesSearch),
-		                                                // drop down
-			));
+		$fields->addFieldsToTab('Root.Catalogue',
+				array(
+					$gnfields = new CompositeField(array(
+						$url = new TextField('GeonetworkBaseURL', 'URL'),
+						$user = new TextField('Username','Username'),
+						$pass = new PasswordField('Password','Password')
+					)),
+					$emailfields = new CompositeField(array(
+						$name = new TextField('EmailName', 'Name'),
+						$email = new EmailField('SendConfitmationsTo', 'EMail')
+					)),
+					$redirect = new DropdownField('RedirectOnSuccess','Redirect to',$pagesSearch)
+				));
 
-		if(CataloguePage::get_site_status() != 'setup') {
-			$fields->makeFieldReadonly('GeonetworkBaseURL');
-			$fields->makeFieldReadonly('SendConfitmationsTo');
-			$fields->makeFieldReadonly('EmailName');
-			$fields->makeFieldReadonly('Username');
-			$fields->makeFieldReadonly('RedirectOnSuccess');
+		$gnfields->setTag('fieldset');
+		$gnfields->setLegend('<h3>GeoNetwork Configurations</h3>');
 
-			$fields->removeByName('Password');
-		}
+		$url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
+		$user->setDescription('Geonetwork user name.<br>'.'The user must be defined in GeoNetwork. All new records created via this page will be owned by this user in Geonetwork.');
+		$pass->setDescription('Geonetwork password.');
+
+		$emailfields->setTag('fieldset');
+		$emailfields->setLegend('<h3>EMail Settings</h3>');
+
+		$name->setDescription('Name of the person who gets notified when new records are submitted.');
+		$email->setDescription('Email address of that person who receives the notifications.');
+
+		$redirect->setDescription('Redirect the user to this page after a metadata record has been submitted, i.e. to show the details of the new record.');
 
 		// return the modified fieldset.
 		return $fields;
