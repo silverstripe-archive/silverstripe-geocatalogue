@@ -208,8 +208,11 @@ class ParseXML2ANZLICCommand extends ParseXMLCommand {
 						$mdCitationDate=array();
 						$mdCitationDate['MDDateTime'] = $this->queryNodeValue($xpath,'gmd:date/gco:DateTime',$dateItem);
 						$mdCitationDate['MDDate'] = $this->queryNodeValue($xpath,'gmd:date/gco:Date',$dateItem);
-						$mdCitationDate['MDDateType'] = $this->queryNodeValue($xpath,'gmd:dateType/gmd:CI_DateTypeCode',$dateItem);
 
+						$parse_DateTypeList = $xpath->query('gmd:dateType/gmd:CI_DateTypeCode',$dateItem);
+						if ($parse_DateTypeList->length > 0) {
+							$mdCitationDate['MDDateType']  = $parse_DateTypeList->item(0)->attributes->getNamedItem('codeListValue')->nodeValue;
+						}
 						$mdCitationDates[]=$mdCitationDate;
 					}
 					$mdItem['MDCitationDates:MDCitationDate'] = $mdCitationDates;
