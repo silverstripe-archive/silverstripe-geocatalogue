@@ -93,29 +93,32 @@ class GnInsertCommand extends GnAuthenticationCommand {
         $doc->loadXML($responseXML);
 		$xpath = new DOMXPath($doc);
 
-        $idList = $xpath->query('/response/id');
+		// get ID
 		$gnID = null;
-		if ($idList->length > 0) {
-			$gnID = $idList->item(0)->nodeValue;
-		}
+		$idList = $xpath->query('/response/id');
+		if ($idList->length > 0) $gnID = $idList->item(0)->nodeValue;
 
 		if (!isset($gnID)) {
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork ID for the new dataset has not been created.');
 		}
 
+
+		// get UUID based on GeoNetwork version used in the backend. The version 2.10+ provides a more effective API and
+		// does not require the command to send of another request to retrieve the UUID of the new record.
+		$uuid = null;
+		$cmd = $controller->getCommand("GnGetUUIDOfRecordByID", $data);
+		$cmd->setUsername($page->Username);
+		$cmd->setPassword($page->Password);
+
+		$uuid = $cmd->execute();
+		if (!isset($uuid)) {
+			throw new GeonetworkInsertCommand_Exception("New metadata record has been created, but GeoNetwork can not provide the UUID for the new record.");
+		}
+
 		// update metadata record and send an update to add the UUID to the record.
 		$data = $this->getParameters();
 		$data['gnID'] = $gnID;
-		
-		$cmd = $this->getController()->getCommand("GnGetUUIDOfRecordByID", $data);		
-		$cmd->setUsername($page->Username);
-		$cmd->setPassword($page->Password);	
-		
-		$uuid = $cmd->execute();
-
-		if (!isset($uuid)) {
-			throw new GeonetworkInsertCommand_Exception("New metadata record has been created, but GeoNetwork can not provide the UUID for the new record."); 
-		}
+		$data['UUID'] = $uuid;
 
 		// generate update GeoNetwork HTTP request (query metadata).
 		if ($this->get_automatic_publishing()) {
