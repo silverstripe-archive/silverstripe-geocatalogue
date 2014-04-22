@@ -1,0 +1,7 @@
+---
+Name: openlayersroutes
+After: 'rootroutes'
+---
+Director:
+  rules:
+    'geonetwork_info': 'GeoNetwork_Controller'
