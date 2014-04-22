@@ -11,16 +11,12 @@
  * This command sends a request to the GeoNetwork node to retrieve a single metadata 
  * record. It returns a XML string which is the plain XML catalogue response.
  */
-class  GetRecordByIdCommand extends GnAuthenticationCommand {
+class GetRecordByIdCommand extends GnAuthenticationCommand {
 
-	static $catalogue_url = 'srv/en/csw';
-	
-	static function get_catalogue_url() {
-		return self::$catalogue_url;
-	}
-	
-	static function set_catalogue_url( $value ) {
-		self::$catalogue_url = $value;
+	public function get_catalogue_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+		return $config[$version]['csw_url'];
 	}
 	
 	/**

@@ -38,3 +38,16 @@ Catalogue:
       'request': 'cswGetRecordsSummaryISO_xml'
       'response':      'ParseXML2Summary'
       'full_response': 'ParseXML2MCP'
+
+
+  geonetwork:
+
+    api_version: 'geonetwork_v2_10'
+
+    default:
+      csw_url: 'srv/en/csw'
+      geonetwork_url: 'srv/en/xml.metadata'
+
+    geonetwork_v2_10:
+      csw_url: 'srv/eng/csw'
+      geonetwork_url: 'srv/eng/xml.metadata'

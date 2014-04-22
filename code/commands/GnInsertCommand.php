@@ -11,8 +11,6 @@
  */
 class GnInsertCommand extends GnAuthenticationCommand {
 
-	static $api_url = 'srv/en/xml.metadata.insert';
-
 	private $gnID = null;
 
 	private $uuid = null;
@@ -33,6 +31,12 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		return $this->gnID;
 	}
 	
+	public function get_api_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+		return $config[$version]['geonetwork_url'].'.insert';
+	}
+
 	public function get_automatic_publishing() {
 		return Config::inst()->get('Catalogue', 'automatic_publishing');
 	}
@@ -68,7 +72,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		// insert metadata into GeoNetwork
 		$headers = array('Content-Type: application/x-www-form-urlencoded');
 
-		$response    = $this->restfulService->request(self::$api_url,'POST',$params, $headers);
+		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);
 		$responseXML = $response->getBody();
 
 		// We expect a status code of 200 for the insert/getrecords and getrecordsbyid requests.

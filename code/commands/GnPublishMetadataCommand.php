@@ -10,30 +10,12 @@
  */
 class GnPublishMetadataCommand extends GnAuthenticationCommand {
 
-	/**
-	 * @var string $api_url refers the the GeoNetwork action to perform the publish process.
-	 */
-	static $api_url = 'srv/en/metadata.admin';
-	static $RequireAuth = true;
-
-//	static $xsl_path = '../geocatalogue/xslt/gnInsertResponse.xsl';
-
-	static function get_api_url() {
-		return self::$api_url;
-	}
-	
-	static function set_api_url( $value ) {
-		self::$api_url = $value;
+	public function get_api_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+		return $config[$version]['geonetwork_url'].'.privileges';
 	}
 
-//	static function get_xsl_path() {
-//		return self::$xsl_path;
-//	}
-//
-//	static function set_xsl_path( $xsl_path ) {
-//		self::$xsl_path = $xsl_path;
-//	}
-	
 	/**
 	 * Command execute
 	 *
@@ -64,7 +46,7 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
 		$headers     = array('Content-Type: application/x-www-form-urlencoded');
-		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);	
+		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);
 		// @todo better error handling
 		$responseXML = $response->getBody();
 

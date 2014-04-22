@@ -10,21 +10,15 @@
  * 
  * This command sends a request to the GeoNetwork node to search for Metadata 
  * records. It returns a XML string which is the plain XML catalogue response.
- *
- * @throws GeoNetworkRestfulService_Exception
  */
 class GetRecordsCommand extends GnAuthenticationCommand {
-	
-	static $catalogue_url = 'srv/en/csw';
-	
-	static function get_catalogue_url() {
-		return self::$catalogue_url;
+
+	public function get_catalogue_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+		return $config[$version]['csw_url'];
 	}
 	
-	static function set_catalogue_url( $value ) {
-		self::$catalogue_url = $value;
-	}
-		
 	/**
 	 * Command execute
 	 *
@@ -51,9 +45,8 @@ class GetRecordsCommand extends GnAuthenticationCommand {
 		}
 
 		$headers     = array('Content-Type: application/xml');
-		$response    = $this->restfulService->request(self::get_catalogue_url(),'POST',$xml, $headers);	
+		$response    = $this->restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
 		
-		// @todo better error handling
 		$responseXML = $response->getBody();
 		return $responseXML;
 	}

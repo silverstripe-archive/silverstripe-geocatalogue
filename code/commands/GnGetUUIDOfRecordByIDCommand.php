@@ -13,35 +13,12 @@
  */
 class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 
-	/**
-	 * @var string $api_url refers the the GeoNetwork action to perform the publish process.
-	 */
-	static $api_url = 'srv/en/xml.metadata.get?';
-	
-	static $RequireAuth = true;
-
-//	static $xsl_path = '../geocatalogue/xslt/gnParseUUID.xsl';
-
-	private $username = '';
-	
-	private $password = '';
-
-	static function get_api_url() {
-		return self::$api_url;
-	}
-	
-	static function set_api_url( $value ) {
-		self::$api_url = $value;
+	public function get_api_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+		return $config[$version]['geonetwork_url'].'.get?';
 	}
 
-//	static function get_xsl_path() {
-//		return self::$xsl_path;
-//	}
-//
-//	static function set_xsl_path( $xsl_path ) {
-//		self::$xsl_path = $xsl_path;
-//	}
-	
 	/**
 	 * Command execute
 	 *
@@ -93,8 +70,3 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		return $fileIdentifier;
 	}
 }
-
-/**
- * Customised excpetion class
- */
-class GnGetUUIDOfRecordByIDCommand_Exception extends Exception {}
