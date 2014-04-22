@@ -237,18 +237,6 @@ class RegisterDataPage_Controller extends Page_Controller
 		try {
 			$gnID = $cmd->execute();
 		}
-		catch(GeoNetworkRestfulService_Exception $exception) {
-			// add error message
-			$message = 'Unfortunately the registration process failed due to a technical problem. Please retry later. ';
-			$message .= $exception->getMessage();
-			$form->sessionMessage($message, 'bad');
-
-			$emailValues = $this->generateEmailTemplateValues('', $exception->getMessage());
-			$this->sendEmail($emailValues, 'ErrorEMail');
-
-			$this->redirectBack();
-			return;
-		}
 		catch(GeonetworkInsertCommand_Exception $exception) {
 			// add error message
 			$message = 'Unfortunately the registration process failed due to a technical problem. Please retry later. ';
@@ -296,7 +284,7 @@ class RegisterDataPage_Controller extends Page_Controller
 	 */
 	function generateEmailTemplateValues($text = '', $exceptionMsg = 'Something went wrong'){
 		if ($text == '') {
-			$text = 'While doing a "GnInsert" we caught the following "GeoNetworkRestfulService_Exception" exception:';
+			$text = 'While doing a "GnInsert" we caught the following "Exception" exception:';
 		}
 
 		return $emailValues = array(

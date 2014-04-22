@@ -58,19 +58,11 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		
 		$id = $data['gnID'];
 
-		try {
-			$this->restfulService = new GeoNetworkRestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-			
-			if ($this->getUsername()) {
-				$this->restfulService->setUsername($this->getUsername());
-				$this->restfulService->setPassword($this->getPassword());
-				$this->restfulService->setRequireAuthentication(true);
-			}
+		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
+		if ($this->getUsername() ) {
+			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
 		}
-		catch (GeoNetworkRestfulService_Exception $e) {
-			throw new GnGetUUIDOfRecordByIDCommand_Exception($e->getMessage());
-		}
-		
+
 		// generate GeoNetwork HTTP request (query metadata).
 		$cmd = null;
 

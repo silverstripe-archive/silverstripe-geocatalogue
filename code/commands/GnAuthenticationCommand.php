@@ -16,6 +16,8 @@
  **/
 class GnAuthenticationCommand extends ControllerCommand {
 
+	public $restfulService = null;
+
 	private $username = '';
 	
 	private $password = '';

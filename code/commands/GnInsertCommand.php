@@ -53,31 +53,18 @@ class GnInsertCommand extends GnAuthenticationCommand {
 	public function execute() {
 		
 		$controller = Controller::curr();
-		$cookie_filename = TEMP_FOLDER."/gncookie.txt";
 
 		// get GeoNetwork Page type
 		$page = $controller->data();
-		if ($page == null) {
-			throw new GeonetworkInsertCommand_Exception('Internal Server Error: Controller could not detect page.');
-		}
 
 		$data = $this->getParameters();
 		$params = $data['RequestParameter'];
-		
-		try {
-			$this->restfulService = new GeoNetworkRestfulService($this->getController()->getGeoNetworkBaseURL(),0);
 
-			if ($this->getUsername() ) {
-				$this->restfulService->setUsername($this->getUsername());
-				$this->restfulService->setPassword($this->getPassword());
-				$this->restfulService->setRequireAuthentication(true);
-			}
+		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
+		if ($this->getUsername() ) {
+			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
 		}
-		catch (GeoNetworkRestfulService_Exception $e) {
-			throw new GeonetworkInsertCommand_Exception($e->getMessage());
-		}
-		
-		
+
 		// insert metadata into GeoNetwork
 		$headers = array('Content-Type: application/x-www-form-urlencoded');
 

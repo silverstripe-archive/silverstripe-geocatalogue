@@ -48,20 +48,14 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 	public function execute() {
 		$data       = $this->getParameters();
 		$gnID 		= $data['gnID'];
-		try {
-			$this->restfulService = new GeoNetworkRestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-			if ($this->getUsername() ) {
-				$this->restfulService->setUsername($this->getUsername());
-				$this->restfulService->setPassword($this->getPassword());
-				$this->restfulService->setRequireAuthentication(true);
-			}			
+
+		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
+		if ($this->getUsername() ) {
+			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
 		}
-		catch (CataloguePage_Exception $e) {
-			throw new GnPublishMetadataCommand_Exception($e->getMessage());
-		}
-		
+
 		// build the parameters for the publish request. It is a structure of
-		// a geonetwork form to publish the data to non-registered users and 
+		// a geonetwork form to publish the data to non-registered users and
 		// allow the download of assigned data sources.
 		$data = array();
 		$data['id']       = $gnID;

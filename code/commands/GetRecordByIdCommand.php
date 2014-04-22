@@ -45,20 +45,15 @@ class  GetRecordByIdCommand extends GnAuthenticationCommand {
 		$xml = $cmd->execute();		
 
 		// send requrest to GeoNetwork
-		$this->restfulService = new GeoNetworkRestfulService($this->getController()->getGeoNetworkBaseURL(),0);
+		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
 		if ($this->getUsername() ) {
-			$this->restfulService->setUsername($this->getUsername());
-			$this->restfulService->setPassword($this->getPassword());
-			$this->restfulService->setRequireAuthentication(true);
+			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
 		}
-						
-		$headers     = array('Content-Type: application/xml');
-		$response    = $this->restfulService->request(self::get_catalogue_url(),'POST',$xml, $headers);	
-		
-		// @todo better error handling
-		$responseXML = $response->getBody();
 
-		return $responseXML;		
+		$headers     = array('Content-Type: application/xml');
+		$response    = $this->restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
+		
+		return $response->getBody();;
 	}
 	
 }

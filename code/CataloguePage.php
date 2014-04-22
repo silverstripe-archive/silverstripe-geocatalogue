@@ -42,7 +42,6 @@ class CataloguePage extends Page {
 
         Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 
-
         $fields->addFieldsToTab('Root.Catalog', array(
 	        $gnfields = new CompositeField(array(
 	   						$url = new TextField('GeonetworkBaseURL', 'URL'),
@@ -59,7 +58,6 @@ class CataloguePage extends Page {
 		$user->setDescription('Geonetwork user name.');
 		$pass->setDescription('Geonetwork password.');
 	    $results->setDescription('Define how many results per page shell be shown (1 .. 99).');
-
 
         if (CataloguePage::get_site_status() != 'setup') {
             $fields->makeFieldReadonly('GeonetworkBaseURL');
@@ -179,18 +177,10 @@ class CataloguePage_Controller extends Page_Controller {
         );
 
 
-        try {
-            $cmd = $this->getCommand("GetRecords", $data);
-            $cmd->setUsername($this->owner->GeonetworkUsername);
-            $cmd->setPassword($this->owner->GeonetworkPassword);
-            $responseXML = $cmd->execute();
-        } catch (GeoNetworkRestfulService_Exception $exception) {
-            $prefix = $this->prefixx();
-            $mess = 'Unfortunately the query process failed due to a technical problem. Please retry later.';
-            Session::set($prefix . ".errors.message", $mess);
-            Session::set($prefix . ".errors.messageType", 'Error');
-            return $this->render();
-        }
+        $cmd = $this->getCommand("GetRecords", $data);
+        $cmd->setUsername($this->owner->GeonetworkUsername);
+        $cmd->setPassword($this->owner->GeonetworkPassword);
+        $responseXML = $cmd->execute();
 
         // parse response
         try {
@@ -216,6 +206,7 @@ class CataloguePage_Controller extends Page_Controller {
 
         // calculate pagination values
         $this->calculatePaginationValues($resultSet, $query);
+
         return $this->render();
     }
 
@@ -249,21 +240,10 @@ class CataloguePage_Controller extends Page_Controller {
                       'requestxml' => 'cswGetRecordByID_xml');
 
         // get XML document for requested metadata entry.
-
-        try {
-            $cmd = $this->getCommand("GetRecordById", $data);
-            $cmd->setUsername($this->owner->GeonetworkUsername);
-            $cmd->setPassword($this->owner->GeonetworkPassword);
-            $responseXML = $cmd->execute();
-        } catch (GeoNetworkRestfulService_Exception $exception) {
-            $prefix = $this->prefixx();
-            $mess = 'Unfortunately the query process failed due to a technical problem. Please retry later.';
-            Session::set($prefix . ".errors.message", $mess);
-            Session::set($prefix . ".errors.messageType", 'Error');
-
-            // @TODO add error message
-            return $this->render();
-        }
+        $cmd = $this->getCommand("GetRecordById", $data);
+        $cmd->setUsername($this->owner->GeonetworkUsername);
+        $cmd->setPassword($this->owner->GeonetworkPassword);
+        $responseXML = $cmd->execute();
 
         // If xml representation is requestet, forward the answer
         // using {$uuid}.xml as filename
