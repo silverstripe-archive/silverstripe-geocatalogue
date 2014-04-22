@@ -280,7 +280,6 @@ class RegisterDataPage_Controller extends Page_Controller
 
 			$emailValues = $this->generateEmailTemplateValues('', $exception->getMessage());
 			$this->sendEmail($emailValues, 'ErrorEMail');
-
 			$this->redirectBack();
 			return;
 		}

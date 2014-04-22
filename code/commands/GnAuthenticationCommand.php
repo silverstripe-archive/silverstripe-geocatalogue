@@ -1,18 +1,13 @@
 <?php
 /**
  * 
- *
  * @author Rainer Spittel
  * @version $Id$
- * @copyright SilverStripe Ltd., 25 May, 2011
- * @package default
+ * @package geocatalogue
  **/
 
 /**
  * GnAuthenticationCommand class - implements the API to manage user credentials for GeoNetwork API calls.
- *
- * @package geocatalog
- * @author Rainer Spittel
  **/
 class GnAuthenticationCommand extends ControllerCommand {
 
@@ -25,11 +20,10 @@ class GnAuthenticationCommand extends ControllerCommand {
 	/**
 	 * Sets username for GeoNetwork authentication.
 	 *
+	 * @param $username
 	 * @return void
-	 * @author Rainer Spittel
 	 **/
-	function setUsername($username)
-	{
+	function setUsername($username) {
 		$this->username = $username;
 	}
 
@@ -37,21 +31,18 @@ class GnAuthenticationCommand extends ControllerCommand {
 	 * Returns username for GeoNetwork authentication.
 	 *
 	 * @return string
-	 * @author Rainer Spittel
 	 **/
-	function getUsername()
-	{
+	function getUsername() {
 		return $this->username;
 	}
 	
 	/**
 	 * Sets password for GeoNetwork authentication.
 	 *
+	 * @param $password
 	 * @return void
-	 * @author Rainer Spittel
 	 **/
-	function setPassword($password)
-	{
+	function setPassword($password) {
 		$this->password = $password;
 	}
 	
@@ -59,13 +50,11 @@ class GnAuthenticationCommand extends ControllerCommand {
 	 * Returns password for GeoNetwork authentication.
 	 *
 	 * @return string
-	 * @author Rainer Spittel
 	 **/
-	function getPassword()
-	{
+	function getPassword() {
 		return $this->password;
 	}
-	
+
 	public function execute() {
 	}
 } // END class 
