@@ -17,7 +17,8 @@ class CataloguePage extends Page {
     public static $db = array('ResultsPerSearchPage' => "Int",
                               'GeonetworkBaseURL' => "Varchar",
                               'GeonetworkUsername' => "Varchar",
-                              'GeonetworkPassword' => "Varchar",);
+                              'GeonetworkPassword' => "Varchar");
+
     static $defaults = array('ResultsPerSearchPage' => 10);
     /**
      * This variable defines the status of the website. If it is set to
@@ -89,8 +90,9 @@ class CataloguePage extends Page {
     private function addEndingSlash($url) {
         if (strlen($url) > 1) {
             $length = strlen($url) - 1;
-
-            if ($url[$length] != '/') $url .= '/';
+            if ($url[$length] != '/') {
+	            $url .= '/';
+            }
         }
         return $url;
     }
