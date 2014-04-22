@@ -230,7 +230,6 @@ class RegisterDataPage_Controller extends Page_Controller
 	 * @todo add error message when geonetwork is down
 	 */
 	function doRegisterMetadata($data, $form) {
-
 		$page = $this->data();
 
 		// process form submission and send request to GeoNetwork.
@@ -258,7 +257,14 @@ class RegisterDataPage_Controller extends Page_Controller
 		$parameters = $cmd->execute();
 
 		// Create record in GeoNetwork
-		$cmd = $this->getCommand("GnInsert", array('RequestParameter' => $parameters));
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		if ($config['api_version'] == 'geonetwork_v2_10') {
+			$cmd = $this->getCommand("GnInsert_v2_10", array('RequestParameter' => $parameters));
+			$cmd->setDOMetadata($metadata);
+		} else {
+			$cmd = $this->getCommand("GnInsert", array('RequestParameter' => $parameters));
+		}
+
 		$cmd->setUsername($page->Username);
 		$cmd->setPassword($page->Password);
 
