@@ -21,7 +21,9 @@ class RegisterDataPage extends Page
 	                          'Password' => "Varchar",
 	                          'SendConfitmationsTo' => "Varchar",
 	                          'EmailName' => "Varchar",
-							  'GeonetworkGroup' => 'Int');
+							  'GeonetworkGroupID' => 'Int',
+							  'GeonetworkName' => 'Varchar',
+							  'Privilege' => 'Varchar');
 
 	/**
 	 * Return the email address of the sender.
@@ -52,6 +54,8 @@ class RegisterDataPage extends Page
 		Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
 		$pagesSearch = CatalogueHomePage::get_page_subclasses('CataloguePage');
 
+		$groupArray = array($this->GeonetworkGroupID => $this->GeonetworkName);
+
 		// customise form fields
 		$fields->addFieldsToTab('Root.Catalogue',
 				array(
@@ -60,12 +64,37 @@ class RegisterDataPage extends Page
 						$user = new TextField('Username','Username'),
 						$pass = new PasswordField('Password','Password')
 					)),
+					$grpfields = new CompositeField(array(
+						new HiddenField('GeonetworkGroupID','GeonetworkGroupID'),
+						new HiddenField('GeonetworkName','GeonetworkName'),
+						$gnGroupDropdown = new DropdownField('GeonetworkGroupID_dp','Geonetwork-Group', $groupArray ,$this->GeonetworkGroupID),
+						new LiteralField('groupsbutton1',"<div class='field'><div class='middleColumn'><a href='#' data-icon='add' data-selected='".$this->GeonetworkGroupID."' class='ss-ui-button geonetwork_load_groups' data-url='geonetwork_info/dogetgroups/".$this->ID."'>Load and update list of groups</a></div></div>"),
+					)),
+					$pubfields = new CompositeField(array(
+						$checkboxset = new CheckboxSetField('Privilege','Privilege',array(
+							'0' => 'View',
+							'1' => 'Download',
+							'2' => 'Editing',
+							'3' => 'Notify',
+							'4' => 'Dynamic',
+							'5' => 'Features'
+						),$this->Privilege)
+					)),
 					$emailfields = new CompositeField(array(
 						$name = new TextField('EmailName', 'Name'),
 						$email = new EmailField('SendConfitmationsTo', 'EMail')
 					)),
 					$redirect = new DropdownField('RedirectOnSuccess','Redirect to',$pagesSearch)
 				));
+
+		$gnGroupDropdown->setDescription('The GeoNetwork group defines the user group who owns new created records. It is a mandatory field.');
+		$checkboxset->setDescription('Once a record has been added to the catalog, define how the permissions to this records shall be set for public users.');
+
+		$grpfields->setTag('fieldset');
+		$grpfields->setLegend('<h3>Dataset Permissions</h3>');
+
+		$pubfields->setTag('fieldset');
+		$pubfields->setLegend('<h3>Dataset Publication</h3>');
 
 		$gnfields->setTag('fieldset');
 		$gnfields->setLegend('<h3>GeoNetwork Configurations</h3>');
