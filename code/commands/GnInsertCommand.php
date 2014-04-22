@@ -77,12 +77,14 @@ class GnInsertCommand extends GnAuthenticationCommand {
 
 		// We expect a status code of 200 for the insert/getrecords and getrecordsbyid requests.
 		if ($response->getStatusCode() != 200) {
-			throw new GeonetworkInsertCommand_Exception('HTTP request return following response code:'.$response->getStatusCode());
+			throw new GeonetworkInsertCommand_Exception('HTTP request return following response code:'.$response->getStatusCode().' - '.$response->getStatusDescription());
 		}
 
 		// because we use the Geonetwork API, the error message are returned as HTML page.
-		if ( strpos($responseXML, "<html>" ) === 0 ) {
-			if ( strpos($responseXML, "Duplicate entry" ) != false ) throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',101);
+		if (strpos($responseXML, "<html>") === 0 ) {
+			if ( strpos($responseXML, "Duplicate entry" ) != false ) {
+				throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',101);
+			}
 			throw new GeonetworkInsertCommand_Exception('GeoNetwork responded with an invalid HTML string.',100);
 		}
 
