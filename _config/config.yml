@@ -12,7 +12,10 @@ Catalogue:
 
   'site_status': 'setup'
 
-  'automatic_publishing': false
+  # Email_sender used for all emails send out by the catalogue module as a sender. This includes
+  # Confirmation emails to the website user who registers new records and notifications to the maintainer
+  # of the website.
+  'email_sender': ''
 
   standard_definitions:
     iso:
