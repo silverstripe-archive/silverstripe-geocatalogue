@@ -47,10 +47,35 @@ class GeoNetwork_Controller extends Controller {
 		$headers = array('Content-Type: application/xml');
 		$postbody = "<request><type>groups</type></request>";
 
-//		$response    = $restfulService->request('srv/eng/xml.info','POST',$postbody, $headers);
-//		$xml = $response->getBody();
+		$response    = $restfulService->request('srv/eng/xml.info','POST',$postbody, $headers);
+		$xml = $response->getBody();
 
-		$xml = <<<xml
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$array_groups = array();
+		$groupList = $xpath->query('/info/groups/group');
+
+		foreach($groupList as $group) {
+			$id = $group->attributes->getNamedItem('id')->nodeValue;
+
+			$xName = $xpath->query('name', $group);
+			if ($xName->length > 0) {
+				$name = $xName->item(0)->nodeValue;
+			}
+
+			$array_groups[$id] = $name;
+		}
+		return json_encode($array_groups);
+	}
+}
+
+/*
+ *
+ *
+
+$xml = <<<xml
 <?xml version="1.0" encoding="UTF-8"?>
 <info>
   <groups>
@@ -100,24 +125,6 @@ class GeoNetwork_Controller extends Controller {
 </info>
 xml;
 
-		$doc  = new DOMDocument();
-		$doc->loadXML($xml);
-		$xpath = new DOMXPath($doc);
-
-		$array_groups = array();
-		$groupList = $xpath->query('/info/groups/group');
-
-//		$array_groups[''] = 'Please select a GeoNetwork group';
-		foreach($groupList as $group) {
-			$id = $group->attributes->getNamedItem('id')->nodeValue;
-
-			$xName = $xpath->query('name', $group);
-			if ($xName->length > 0) {
-				$name = $xName->item(0)->nodeValue;
-			}
-
-			$array_groups[$id] = $name;
-		}
-		return json_encode($array_groups);
-	}
-}
+ *
+ *
+ */
