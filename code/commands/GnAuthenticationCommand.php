@@ -55,6 +55,27 @@ class GnAuthenticationCommand extends ControllerCommand {
 		return $this->password;
 	}
 
-	public function execute() {
+	/**
+	 * @param $value
+	 */
+	public function setRestfulService($value) {
+		$this->restfulService = $value;
 	}
+
+	/**
+	 * @return RestfulService
+	 */
+	public function getRestfulService() {
+		if ($this->restfulService == null) {
+			$restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
+			if ($this->getUsername() ) {
+				$restfulService->basicAuth($this->getUsername(), $this->getPassword());
+			}
+			$this->restfulService = $restfulService;
+		}
+		return $this->restfulService;
+	}
+
+	public function execute() {}
+
 } // END class 
