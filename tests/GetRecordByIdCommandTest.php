@@ -4,11 +4,8 @@
  * @package geocatalog
  * @subpackage tests
  */
-class GetRecordByIdCommandTest extends SapphireTest {
+class GetRecordByIdCommandTest extends FunctionalTest {
 
-	/**
-	 * Also uses SimpleNzctFixture in setUp()
-	 */
 	static $fixture_file = 'geocatalogue/tests/GetRecordByIdCommandTest.yml';
 
 	protected $controller = null;
@@ -27,144 +24,165 @@ class GetRecordByIdCommandTest extends SapphireTest {
 
 		$this->controller = new BrowsePage_Controller($page);
 		$this->controller->pushCurrent();
-		
-		//GetRecordsCommand::set_catalogue_url("/dogetrecordbyid/7f1db956-b017-427c-866d-25c7a8af7384/?usetestmanifest=1&flush=1");
-		GetRecordByIdCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
+
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+
+		$array = $config[$version];
+		$array['csw_url'] = "/getrecords";
+		$config[$version] = $array;
+
+		Config::inst()->update('Catalogue', 'geonetwork', $config);
 	}
 
 	/**
 	 * Remove test controller from global controller-stack.
 	 */
 	function tearDown() {
-		
 		$this->controller->popCurrent();
-		
 		parent::tearDown();
 	}
 
+	/**
+	 * Test the GetRecordById attributes of the XML request document
+	 */
+	function testRequestAttributes() {
+		$data = array(
+			'fileIdentifier' => Convert::raw2xml(''),
+			'outputFormat'   => Convert::raw2xml('html'),
+			'requestxml'     => 'cswGetRecordByID_xml'
+		);
+		
+		$cmd = $this->controller->getCommand("GetRecordById", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordByIdCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$rootList = $xpath->query('/csw:GetRecordById');
+
+		$this->assertEquals(1,$rootList->length,"Root element has not been created correctly.");
+
+		$rootnode = $rootList->item(0);
+		$this->assertEquals($rootnode->attributes->getNamedItem('service')->nodeValue,'CSW',"Attribute 'service' has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('version')->nodeValue,'2.0.2',"Attribute 'version' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('outputSchema')->nodeValue,'csw:IsoRecord',"Attribute 'OutputSchema' for CSW has not been set correctly.");
+	}
 
 	/**
-	 * Test the testGetRecordByIdCommand
-	 *
-	 * Test the testGetRecordByIdCommand. The test controller GetRecordByIdCommandTest_Controller
-	 * expects a certain request and returns ok or failed.
-	 *
-	 * This test tests the cswGetRecordById_xml template only.
-	 *
-	 * @see GetRecordByIdCommand
-	 * @see GetRecordByIdCommandTest_Controller
+	 * Test that id and ElementSetName is set correctly.
 	 */
-	function testGetRecordByIdCommand() {
-
-		$id           = '7f1db956-b017-427c-866d-25c7a8af7384';
+	function testRequestDocument() {
+		$id = '7f1db956-b017-427c-866d-25c7a8af7384';
 		$outputFormat = 'html';
-		$format       = 'iso';
 
 		$data = array(
 			'fileIdentifier' => Convert::raw2xml($id),
 			'outputFormat'   => Convert::raw2xml($outputFormat),
 			'requestxml'     => 'cswGetRecordByID_xml'
 		);
+
+		$cmd = $this->controller->getCommand("GetRecordById", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordByIdCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$rootList = $xpath->query('/csw:GetRecordById');
+
+		$this->assertEquals(1,$rootList->length,"Root element has not been created correctly.");
+
+		$rootnode = $rootList->item(0);
+
+		$list = $xpath->query('csw:ElementSetName',$rootnode);
+		$this->assertEquals(1,$list->length,"Number of ElementSetName elements supposed to be one item only.");
+
+		$node = $list->item(0);
+		$this->assertEquals('full',$node->nodeValue,"ElementSetName node has not been set correctly.");
+
+		$list = $xpath->query('csw:Id',$rootnode);
+		$this->assertEquals(1,$list->length,"Number of Id elements supposed to be one item only.");
+
+		$node = $list->item(0);
+		$this->assertEquals($id,$node->nodeValue,"ID node has not been set correctly.");
+	}
+
+	/**
+	 * Test request XML with an empty id.
+	 */
+	function testRequestDocumentWithEmptyID() {
+		$id = '';
+		$data = array(
+			'fileIdentifier' => Convert::raw2xml($id),
+			'outputFormat'   => Convert::raw2xml('html'),
+			'requestxml'     => 'cswGetRecordByID_xml'
+		);
 		
 		$cmd    = $this->controller->getCommand("GetRecordById", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecordById xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" service="CSW" version="2.0.2" outputSchema="csw:IsoRecord">');
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordByIdCommandTest_Controller',0));
 
-		if ($position === false) {
-			$this->assertEquals(1,0,"Invalid CSW GetRecordById XML request");
-		}
+		$xml = $cmd->execute();
 
-		$position = strpos($result, "<csw:Id>". $id ."</csw:Id>");
-		if ($position === false) {
-			$this->assertEquals(1,0,"Invalid csw:Id or not found");
-		}
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+
+		$list = $xpath->query('/csw:GetRecordById/csw:Id');
+		$this->assertEquals(1,$list->length,"Number of Id elements supposed to be one item only.");
+
+		$node = $list->item(0);
+		$this->assertEquals($id,$node->nodeValue,"ID node supposed to be empty.");
 	}
 	
-
 	/**
-	 * 
-	 * This test tests the cswGetRecordById_xml template only.
-	 *  Without ID
-	 *
-	 * @see GetRecordByIdCommand
-	 * @see GetRecordByIdCommandTest_Controller
+	 * Test request XML with an id containing a less-than character.
 	 */
-	function testGetRecordByIdCommandWithoutID() {
-
-		$id           = '';
-		$outputFormat = 'html';
-		$format       = 'iso';
-
+	function testRequestDocumentWithLessThanID() {
+		$id = 'whatever < this means';
 		$data = array(
 			'fileIdentifier' => Convert::raw2xml($id),
-			'outputFormat'   => Convert::raw2xml($outputFormat),
+			'outputFormat'   => Convert::raw2xml('html'),
 			'requestxml'     => 'cswGetRecordByID_xml'
 		);
 		
 		$cmd    = $this->controller->getCommand("GetRecordById", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecordById xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" service="CSW" version="2.0.2" outputSchema="csw:IsoRecord">');
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordByIdCommandTest_Controller',0));
 
-		if ($position === false) {
-			$this->assertEquals(1,0,"Invalid CSW GetRecordById XML request");
-		}
+		$xml = $cmd->execute();
 
-		$position = strpos($result, "<csw:Id>". $id ."</csw:Id>");
-		if ($position === false) {
-			$this->assertEquals(1,0,"Failed empty id");
-		}
-	}
-	
-	/**
-	 * 
-	 * This test tests the cswGetRecordById_xml template only.
-	 *  With  > in ID
-	 *
-	 * @see GetRecordByIdCommand
-	 * @see GetRecordByIdCommandTest_Controller
-	 */
-	function testGetRecordByIdCommandWithLessThenInID() {
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
 
-		$id           = 'whatever < this means';
-		$outputFormat = 'html';
-		$format       = 'iso';
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
 
-		$data = array(
-			'fileIdentifier' => Convert::raw2xml($id),
-			'outputFormat'   => Convert::raw2xml($outputFormat),
-			'requestxml'     => 'cswGetRecordByID_xml'
-		);
-		
-		$cmd    = $this->controller->getCommand("GetRecordById", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecordById xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" service="CSW" version="2.0.2" outputSchema="csw:IsoRecord">');
+		$list = $xpath->query('/csw:GetRecordById/csw:Id');
+		$this->assertEquals(1,$list->length,"Number of Id elements supposed to be one item only.");
 
-		if ($position === false) {
-			$this->assertEquals(1,0,"Invalid CSW GetRecordById XML request");
-		}
-
-		$position = strpos($result, "<csw:Id>whatever &lt; this means</csw:Id>");
-		if ($position === false) {
-			$this->assertEquals(1,0,"failed id with < \n" . $result);
-		}
+		$node = $list->item(0);
+		$this->assertEquals('whatever < this means',$node->nodeValue,"ID node supposed to be 'whatever < this means'.");
 	}
 
 	/**
-	 * 
-	 * This test tests the cswGetRecordById_xml template only.
-	 *  With  ' in ID
-	 *
-	 * @see GetRecordByIdCommand
-	 * @see GetRecordByIdCommandTest_Controller
+	 * Test request XML with an id containing a ' character.
 	 */
 	function testGetRecordByIdCommandWithQuoteInID() {
-
 		$id           = 'with \' here';
 		$outputFormat = 'html';
-		$format       = 'iso';
 
 		$data = array(
 			'fileIdentifier' => Convert::raw2xml($id),
@@ -173,32 +191,24 @@ class GetRecordByIdCommandTest extends SapphireTest {
 		);
 		
 		$cmd    = $this->controller->getCommand("GetRecordById", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecordById xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" service="CSW" version="2.0.2" outputSchema="csw:IsoRecord">');
-		if ($position === false) {
-			$this->assertEquals(1,0,"Invalid CSW GetRecordById XML request");
-		}
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordByIdCommandTest_Controller',0));
 
-		// NOTE: 
-		// This is not an interesting change. When converting a ' into xml
-		// we got a plain ' back, later this behaviour changed and returned
-		// &#39;  instead of '.
-		// Again a change, now we get a ' back again. 
-		// Need ot investigate side effects of this new behaviour
-		$position = (strpos($result, "<csw:Id>with &#39; here</csw:Id>")) ? (strpos($result, "<csw:Id>with &#39; here</csw:Id>")) : strpos($result, "<csw:Id>with ' here</csw:Id>");
-		if ($position === false) {
-			$this->assertEquals(1,0,"failed id with ' \n");
-		}
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+
+		$list = $xpath->query('/csw:GetRecordById/csw:Id');
+		$this->assertEquals(1,$list->length,"Number of Id elements supposed to be one item only.");
+
+		$node = $list->item(0);
+		$this->assertEquals("with ' here",$node->nodeValue,"ID node supposed to be 'with ' here'.");
 	}
-	
 }
-
-
-
-
-
-
 
 /**
  * @package geocatalog
@@ -206,10 +216,15 @@ class GetRecordByIdCommandTest extends SapphireTest {
  *
  * Mockup controller class to simulate the GeoNetwork side in this test.
  */
-class GetRecordByIdCommandTest_Controller extends Controller {
+class GetRecordByIdCommandTest_Controller extends Controller implements TestOnly {
+
+	private static $allowed_actions = array(
+		'getrecords'
+	);
 
 	/**
 	 * Standard method, not in use.
+	 * @return string
 	 */
 	function index() {
 		BasicAuth::disable();
@@ -217,14 +232,15 @@ class GetRecordByIdCommandTest_Controller extends Controller {
 	}
 
 	/**
-	 * Returns the request body so that the calling unit test can perform the validation.
+	 * This action returns the post body as a response.
+	 * This way the unit test is able to evaluate the request sent of for testing.
 	 *
-	 * @return string request body
+	 * @param $data
+	 *
+	 * @return mixed
 	 */
 	function getrecords($data) {
-
-		$request = $data->getBody();
-		return $request;
-
+		$result = $data->postVars();
+		return $result[0];
 	}
 }
