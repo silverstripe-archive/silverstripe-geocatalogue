@@ -19,8 +19,7 @@
 				var url = this.data('url');
 				var selectedID = this.data('selected');
 
-				$.getJSON( url , function(data) {
-
+				$.getJSON(url, function(data) {
 					var items = [];
 					$.each( data, function( key, val ) {
 						if (key == selectedID) {
@@ -30,23 +29,28 @@
 							items.push( "<option value='" + key + "'>" + val + "</option>" );
 						}
 					});
-
 					list = items.join( "" );
 
 					$('#Form_EditForm_GeonetworkGroupID_dp option').remove();
-
 					$('#Form_EditForm_GeonetworkGroupID_dp').append(list);
 					$('#Form_EditForm_GeonetworkGroupID_dp').trigger('liszt:updated');
 
 					$('.geonetwork_load_groups .ui-button-text')[0].innerHTML = 'Load and update list of groups';
 
+				}).fail(function(data) {
+					if (data.status == 401) {
+
+					} else
+					if (data.status == 404) {
+
+					}
+					$('.geonetwork_load_groups .ui-button-text')[0].innerHTML = 'Load and update list of groups';
 				});
 				return false;
 			}
 		});
 
 		$('#Form_EditForm_GeonetworkGroupID_dp').entwine({
-
 			onchange: function() {
 				var index = $('#Form_EditForm_GeonetworkGroupID_dp').chosen().val();
 				$('#Form_EditForm_GeonetworkGroupID')[0].value = index;
