@@ -57,8 +57,6 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 	 * @return int GeoNetwork internal ID
 	 */
 	public function execute() {
-		DEBUG::log('GnInsert_v2_10Command executed');
-
 		$controller = Controller::curr();
 
 		// get GeoNetwork Page type

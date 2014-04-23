@@ -18,8 +18,6 @@ class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 	 * @throws GnPublishMetadataCommand_Exception
 	 */
 	public function execute() {
-		DEBUG::log('GnPublishMetadata_v2_10Command executed');
-
 		$data       = $this->getParameters();
 		$gnID 		= $data['gnID'];
 

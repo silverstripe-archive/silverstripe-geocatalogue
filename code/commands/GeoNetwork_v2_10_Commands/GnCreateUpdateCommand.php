@@ -13,8 +13,6 @@ class GnCreateUpdateCommand extends ControllerCommand {
 	 * Metadata records into GeoNetwork.
 	 */
 	public function execute() {
-		DEBUG::log('GnCreateInsertCommand executed');
-
 		$requestData = $this->getParameters();
 
 		$xml = '';
