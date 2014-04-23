@@ -31,25 +31,20 @@ class GetRecordByIdCommand extends GnAuthenticationCommand {
 	 * @return string OGC CSW response
 	 */
 	public function execute() {
-		
 		$data       = $this->getParameters();
 
 		// generate GeoNetwork HTTP request (query metadata).
 		$cmd = null;
 		
 		$cmd = $this->getController()->getCommand("CreateRecordByIdRequest", $data);
-		$xml = $cmd->execute();		
+		$xml = $cmd->execute($this->get_catalogue_url());
 
-		// send requrest to GeoNetwork
-		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-		if ($this->getUsername() ) {
-			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
-		}
+		// send request to GeoNetwork
+		$restfulService = $this->getRestfulService();
 
 		$headers     = array('Content-Type: application/xml');
-		$response    = $this->restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
-		
-		return $response->getBody();;
+		$response    = $restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
+		return $response->getBody();
 	}
 	
 }
