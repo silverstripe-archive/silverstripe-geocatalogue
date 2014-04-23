@@ -59,6 +59,52 @@
 			}
 		});
 
+		$('#Form_EditForm_AutoPublish').entwine({
+			onmatch: function() {
+				var checked = $(this).prop('checked');
+				this.updatePrivilegeFieldSet(checked);
+			},
+
+			onclick: function() {
+				var checked = $(this).prop('checked');
+				this.updatePrivilegeFieldSet(checked);
+			},
+
+			updatePrivilegeFieldSet: function(status) {
+				if (status === true) {
+					$('#Form_EditForm_Privilege .checkbox').prop('disabled',0);
+				} else {
+					$('#Form_EditForm_Privilege .checkbox').prop('disabled',1);
+				}
+			}
+		});
+
+		$('#Form_EditForm_Username.changed').entwine({
+
+			onmatch: function() {
+				$('.geonetwork_load_groups').button("disable");
+			},
+
+			onunmatch: function() {
+				if ($('#Form_EditForm_Password.changed').length == 0) {
+					$('.geonetwork_load_groups').button("enable");
+				}
+			}
+		});
+
+		$('#Form_EditForm_Password.changed').entwine({
+
+			onmatch: function() {
+				$('.geonetwork_load_groups').button("disable");
+			},
+
+			onunmatch: function() {
+				if ($('#Form_EditForm_Username.changed').length == 0) {
+					$('.geonetwork_load_groups').button("enable");
+				}
+			}
+		});
+
 	});
 
 })(jQuery);
