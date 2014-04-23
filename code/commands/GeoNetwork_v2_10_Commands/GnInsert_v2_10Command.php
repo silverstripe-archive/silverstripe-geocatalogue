@@ -40,7 +40,8 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 	}
 
 	public function get_automatic_publishing() {
-		return Config::inst()->get('Catalogue', 'automatic_publishing');
+		$controller = $this->getController();
+		return $controller->data()->AutoPublish;
 	}
 
 	/**

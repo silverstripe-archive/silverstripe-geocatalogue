@@ -23,6 +23,7 @@ class RegisterDataPage extends Page
 	                          'EmailName' => "Varchar",
 							  'GeonetworkGroupID' => 'Int',
 							  'GeonetworkName' => 'Varchar',
+							  'AutoPublish' => 'Boolean',
 							  'Privilege' => 'Varchar');
 
 	/**
@@ -71,6 +72,7 @@ class RegisterDataPage extends Page
 						new LiteralField('groupsbutton1',"<div class='field'><div class='middleColumn'><a href='#' data-icon='add' data-selected='".$this->GeonetworkGroupID."' class='ss-ui-button geonetwork_load_groups' data-url='geonetwork_info/dogetgroups/".$this->ID."'>Load and update list of groups</a></div></div>"),
 					)),
 					$pubfields = new CompositeField(array(
+						$autopublish = new CheckboxField('AutoPublish','Automatic Publishing',$this->AutoPublish),
 						$checkboxset = new CheckboxSetField('Privilege','Privilege',array(
 							'0' => 'View',
 							'1' => 'Download',
@@ -87,6 +89,7 @@ class RegisterDataPage extends Page
 					$redirect = new DropdownField('RedirectOnSuccess','Redirect to',$pagesSearch)
 				));
 
+		$autopublish->setDescription('Set this option to enable automatic record publishing for new records. If enabled, privileges must be set.');
 		$gnGroupDropdown->setDescription('The GeoNetwork group defines the user group who owns new created records. It is a mandatory field.');
 		$checkboxset->setDescription('Once a record has been added to the catalog, define how the permissions to this records shall be set for public users.');
 
