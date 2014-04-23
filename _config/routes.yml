@@ -5,3 +5,5 @@ After: 'rootroutes'
 Director:
   rules:
     'geonetwork_info': 'GeoNetwork_Controller'
+
+    'admin/metadata': "MetadataAdmin"
