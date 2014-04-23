@@ -47,9 +47,22 @@ class GeoNetwork_Controller extends Controller {
 		$headers = array('Content-Type: application/xml');
 		$postbody = "<request><type>groups</type></request>";
 
-		$response    = $restfulService->request('srv/eng/xml.info','POST',$postbody, $headers);
-		$xml = $response->getBody();
+		$response = $restfulService->request('srv/eng/xml.info','POST',$postbody, $headers);
+		if ($response->getStatusCode() == 401) {
+			$this->response->setStatusCode(401);
+			$this->response->setStatusDescription('Permission denied');
+			return "Permission Denied";
+		} elseif ($response->getStatusCode() == 404) {
+			$this->response->setStatusCode(404);
+			$this->response->setStatusDescription('File not found');
+			return 'File not found.';
+		} elseif ($response->getStatusCode() != 200) {
+			$this->response->setStatusCode(500);
+			$this->response->setStatusDescription('Server Error');
+			return 'Server Error';
+		}
 
+		$xml = $response->getBody();
 		$doc  = new DOMDocument();
 		$doc->loadXML($xml);
 		$xpath = new DOMXPath($doc);
