@@ -39,15 +39,34 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 		// build the parameters for the publish request. It is a structure of
 		// a geonetwork form to publish the data to non-registered users and
 		// allow the download of assigned data sources.
+		$controller = $this->getController();
+		$page = $controller->data();
+
+		$privilegeString = $page->Privilege;
+		$privilegeList = explode(',',$privilegeString);
+
+		$groupID = $page->GeonetworkGroupID;
+
+		if ($groupID == '' || $groupID == null) {
+			throw new GnPublishMetadataCommand_Exception('Group for record publishing not set correctly. Please contact the system administrator.');
+		}
+
+		if ($privilegeString == '' || $privilegeString == null) {
+			throw new GnPublishMetadataCommand_Exception('Privileges for publishing not set correctly. Please contact the system administrator.');
+		}
+
 		$data = array();
+		foreach($privilegeList as $privilege) {
+			$data['_1_'.$privilege] = "on";                  // default user (public)
+			$data['_'.$groupID.'_'.$privilege] = "on";
+		}
+		ksort($data);
 		$data['id']       = $gnID;
-		$data['_1_0']      = "on";
-		$data['_1_1']      = "on";
+
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
 		$headers     = array('Content-Type: application/x-www-form-urlencoded');
 		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);
-		// @todo better error handling
 		$responseXML = $response->getBody();
 
         // read GeoNetwork ID from the response-XML document

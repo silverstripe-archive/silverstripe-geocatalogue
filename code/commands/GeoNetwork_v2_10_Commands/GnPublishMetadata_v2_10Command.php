@@ -26,14 +26,30 @@ class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
 		}
 
+		$controller = $this->getController();
+		$page = $controller->data();
+
+		$privilegeString = $page->Privilege;
+		$privilegeList = explode(',',$privilegeString);
+
+		$groupID = $page->GeonetworkGroupID;
+
+		if ($groupID == '' || $groupID == null) {
+			throw new GnPublishMetadataCommand_Exception('Group for record publishing not set correctly. Please contact the system administrator.');
+		}
+
+		if ($privilegeString == '' || $privilegeString == null) {
+			throw new GnPublishMetadataCommand_Exception('Privileges for publishing not set correctly. Please contact the system administrator.');
+		}
+
 		$data = array();
+		foreach($privilegeList as $privilege) {
+			$data['_1_'.$privilege] = "on";                  // default user (public)
+			$data['_'.$groupID.'_'.$privilege] = "on";
+		}
+		ksort($data);
 		$data['id']       = $gnID;
-		$data['_1_0']      = "on";
-		$data['_1_1']      = "on";
-		$data['_1_3']      = "on";
-		$data['_3_0']      = "on";
-		$data['_3_1']      = "on";
-		$data['_3_3']      = "on";
+
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
 		$response    = $this->restfulService->request($this->get_api_url()."?".$params,'GET');
@@ -60,9 +76,3 @@ class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 	}
 
 }
-
-/**
- * Customised Exception class.
- */
-class GnPublishMetadataCommand_Exception extends Exception {}
-
