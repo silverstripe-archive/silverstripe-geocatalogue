@@ -90,6 +90,8 @@ class RegisterDataPage extends Page
 				));
 
 		$autopublish->setDescription('Set this option to enable automatic record publishing for new records. If enabled, privileges must be set.');
+		$user->setAttribute("autocomplete",'off');
+		$pass->setAttribute("autocomplete",'off');
 		$gnGroupDropdown->setDescription('The GeoNetwork group defines the user group who owns new created records. It is a mandatory field.');
 		$checkboxset->setDescription('Once a record has been added to the catalog, define how the permissions to this records shall be set for public users.');
 
