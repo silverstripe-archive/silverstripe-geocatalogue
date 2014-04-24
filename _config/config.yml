@@ -43,7 +43,10 @@ Catalogue:
     default:
       csw_url: 'srv/en/csw'
       geonetwork_url: 'srv/en/xml.metadata'
+      url_publish: 'srv/en/xml.metadata.privileges' # see GnPublishMetadataCommand
+      url_getuuid: 'srv/en/xml.metadata.get' # GnGetUUIDOfRecordByIDCommand
 
     geonetwork_v2_10:
       csw_url: 'srv/eng/csw'
       geonetwork_url: 'srv/eng/xml.metadata'
+      url_publish: 'srv/eng/metadata.admin' # see GnPublishMetadata_v2_10Command
