@@ -200,7 +200,7 @@ class ParseXMLCommandTest extends SapphireTest {
 
 	static $HTMLResponseNoDocType='<html>
 	  <head>
-		<base href="http://www.silverstripe.com/" >
+		<base href="http://www.silverstripe.com/" />
 		<title>SilverStripe.com - Open Source CMS / Framework</title>
 	</head>
 		<body>
@@ -221,33 +221,33 @@ class ParseXMLCommandTest extends SapphireTest {
 	function setUp() {
 		parent::setUp();
 		
-		$url = Director::absoluteBaseURL() . 'GetRecordsCommandTest_Controller';
-
 		$page = $this->objFromFixture('CataloguePage', 'catalogue');
-		$page->GeonetworkBaseURL  = $url;
+		$page->GeonetworkBaseURL  = '###';
 
 		$this->controller = new CataloguePage_Controller($page);
 		$this->controller->pushCurrent();
-		
-		GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
 
-		// check from where the test is executed (important when running the
-		// tests via a CI environment.
-		if( in_array('cli-script.php', scandir('.')) ) {
-			// system is in sapphire directory
-			$this->directory_prefix = '../geocatalogue/xslt/';
-		} else if( in_array('geocatalog', scandir('.'))) {
-			$this->directory_prefix = 'geocatalogue/xslt/';
-		}
+		$this->controller = new CataloguePage_Controller($page);
+		$this->controller->pushCurrent();
+
+//		$config = Config::inst()->get('Catalogue', 'geonetwork');
+//		$version = $config['api_version'];
+//
+//		$array = $config[$version];
+//		$array['csw_url'] = "/getrecords";
+//		$config[$version] = $array;
+//
+//		Config::inst()->update('Catalogue', 'geonetwork', $config);
+//
+//
+//		GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
 	}
 
 	/**
 	 * Remove test controller from global controller-stack.
 	 */
 	function tearDown() {
-		
 		$this->controller->popCurrent();
-		
 		parent::tearDown();
 	}
 
@@ -260,18 +260,15 @@ class ParseXMLCommandTest extends SapphireTest {
 	 *
 	 */
 	function testParseXMLCommand() {
-
-		//setting up the environment
-		
 		$data = array(
-			'xml' => self::$ISO19139response,
-			'xsl' => $this->directory_prefix.'ISO19139/iso19139_to_silverstripe.xsl',
+			'xml' => self::$ISO19139response
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		$result = $cmd->execute();
-		
+
 		$SearchRecord = $result->__get('Items');
-		$this->assertEquals($SearchRecord->TotalItems(),1,'We should have exact one object here');
+		$this->assertEquals($SearchRecord->count(),1,'We should have exact one object here');
 		$metadata = $SearchRecord->First();
 		$uuid = $metadata->fileIdentifier;
 		$this->assertEquals($uuid,'0587e442-eaee-470d-a0d1-3e3a54cc983b','UUID not found after parsing');
@@ -288,15 +285,15 @@ class ParseXMLCommandTest extends SapphireTest {
 
 		//seting up the environment
 		$data = array(
-			'xml' => self::$HTMLResponseNoDocType ,
-			'xsl' => '../geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xml' => self::$HTMLResponseNoDocType
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has to throw an error
 		try {
 			$result = $cmd->execute();
 		}
 		catch(ParseXMLCommand_Exception $e) {
+			$this->assertEquals('Invalid response, contains no GetRecordsResponse node.',$e->getMessage(),'Exception caught but with wrong error message.');
 			return;
 		}
 		$this->assertTrue(false,'ParseXML should throw an error on html-content starting with <html>');
@@ -313,22 +310,22 @@ class ParseXMLCommandTest extends SapphireTest {
 
 		//seting up the environment
 		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xml' => self::$EmptyXMLResponse
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();
 		}
 		catch(ParseXMLCommand_Exception $e) {
-			$this->assertTrue(false,'ParseXML should NOT throw an error on valid xml-content');
+			$this->assertEquals('Invalid response, contains no GetRecordsResponse node.',$e->getMessage(),'Exception caught but with wrong message.');
+			return;
 		}
 		
 		$this->assertTrue(is_a($result,'ViewableData'), 'We should get a ViewableData');
 		
 		$SearchRecord = $result->__get('Items');
-		$this->assertEquals($SearchRecord->TotalItems(),0,'We should have an empty DataObjectSet');
+		$this->assertEquals($SearchRecord->count(),0,'We should have an empty DataObjectSet');
 	}
 
 	/**
@@ -341,10 +338,9 @@ class ParseXMLCommandTest extends SapphireTest {
 
 		//seting up the environment
 		$data = array(
-			'xml' => '' ,
-			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xml' => ''
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();
@@ -352,9 +348,9 @@ class ParseXMLCommandTest extends SapphireTest {
 		catch(ParseXMLCommand_Exception $e) {
 			$this->assertTrue(false,'ParseXML should NOT throw an error on empty Response ');
 		}
-		$this->assertTrue(is_a($result,'ViewableData'), 'We should get a ViewableData');		
+		$this->assertTrue(is_a($result,'ViewableData'), 'We should get a ViewableData');
 		$SearchRecord = $result->__get('Items');
-		$this->assertEquals($SearchRecord->TotalItems(),0,'We should have an empty DataObjectSet');
+		$this->assertEquals($SearchRecord->count(),0,'We should have an empty DataObjectSet');
 	}
 
 	/**
@@ -367,16 +363,16 @@ class ParseXMLCommandTest extends SapphireTest {
 
 		//seting up the environment
 		$data = array(
-			'xml' => null,
-			'xsl' => Director::baseFolder().'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+			'xml' => null
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();
 		}
 		catch(ParseXMLCommand_Exception $e) {
-			return;// ok, we got an exception
+			$this->assertEquals('Expected an XML string, but there is nothing given.',$e->getMessage(),'Exception caught but with wrong message.');
+			return;
 		}
 		$this->assertTrue(false,'ParseXML should throw an error on null Request');
 	}
@@ -391,10 +387,9 @@ class ParseXMLCommandTest extends SapphireTest {
 
 		//seting up the environment
 		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => '',
+			'xml' => self::$EmptyXMLResponse
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();
@@ -419,7 +414,7 @@ class ParseXMLCommandTest extends SapphireTest {
 			'xml' => self::$EmptyXMLResponse ,
 			'xsl' => null,
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();
@@ -443,7 +438,7 @@ class ParseXMLCommandTest extends SapphireTest {
 			'xml' => self::$EmptyXMLResponse ,
 			'xsl' => '../NoStylesheetFound',
 		);
-		$cmd = $this->controller->getCommand("ParseXML", $data);
+		$cmd = $this->controller->getCommand("ParseXML2Summary", $data);
 		//execute has not to throw an error
 		try {
 			$result = $cmd->execute();

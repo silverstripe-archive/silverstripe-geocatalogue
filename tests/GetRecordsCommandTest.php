@@ -6,10 +6,7 @@
  */
 class GetRecordsCommandTest extends SapphireTest {
 
-	/**
-	 * Also uses SimpleNzctFixture in setUp()
-	 */
-  static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
+	static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
 	protected $controller = null;
 
@@ -28,191 +25,279 @@ class GetRecordsCommandTest extends SapphireTest {
 		$this->controller = new CataloguePage_Controller($page);
 		$this->controller->pushCurrent();
 		
-		GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$version = $config['api_version'];
+
+		$array = $config[$version];
+		$array['csw_url'] = "/getrecords";
+		$config[$version] = $array;
+
+		Config::inst()->update('Catalogue', 'geonetwork', $config);
 	}
 
 	/**
 	 * Remove test controller from global controller-stack.
 	 */
 	function tearDown() {
-		
 		$this->controller->popCurrent();
-		
 		parent::tearDown();
 	}
 
-	/**
-	 * Test the testGetRecordsInISOCommand
-	 *
-	 * Test the testGetRecordsInISOCommand. The test controller GetRecordsCommandTest_Controller
-	 * expects a certain request and returns ok or failed.
-	 *
-	 * This test tests the cswGetRecordsSummaryISO_xml template only.
-	 *
-	 * @see GetRecordsCommand
-	 * @see GetRecordsCommandTest_Controller
-	 */
-	function testGetRecordsInISOCommand() {
-
-		$data = array();
-		
-		$data['requestxml']    = "cswGetRecordsSummaryISO_xml";
-		$data['searchterm']    = "testGetRecordsCommand";
-		$data['startPosition'] = "5";
-		$data['maxRecords']    = "15";
-
-		$cmd    = $this->controller->getCommand("GetRecords", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" service="CSW" version="2.0.2" resultType="results" outputSchema="csw:IsoRecord" maxRecords="15" startPosition="5">');
-
-		if ($position === false) {
-			$this->assertEquals(1,0,'Invalid CSW GetRecord XML request.');
-		}
-
-		$position = strpos($result, '<Literal>%testGetRecordsCommand%</Literal>');
-		if ($position === false) {
-			$this->assertEquals(1,0,'Invalid literal search term.');
-		}
-	}
-	
-	/**
-	 * Test the testDefaultValues
-	 *
-	 * Test the testDefaultValues. The test controller GetRecordsCommandTest_Controller
-	 * expects a certain request and returns ok or failed.
-	 *
-	 * This test tests the cswGetRecordsSummaryISO_xml template only.
-	 *
-	 * @see GetRecordsCommand
-	 * @see GetRecordsCommandTest_Controller
-	 */
-	function testDefaultValuesForPaging() {
-
-		$data = array();
-		
-		$data['requestxml']    = "cswGetRecordsSummaryISO_xml";
-		$data['searchterm']    = "testGetRecordsCommand";
+	function testRequestAttributes() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm'   => 'testGetRecordsCommand',
+			'startPosition'   => '5',
+			'maxRecords'     => '15'
+		);
 
 		$cmd = $this->controller->getCommand("GetRecords", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, '<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" service="CSW" version="2.0.2" resultType="results" outputSchema="csw:IsoRecord" maxRecords="10" startPosition="0">');
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
 
-		if ($position === false) {
-			$this->assertEquals(1,0,'Invalid CSW GetRecord XML request.');
-		}
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$rootList = $xpath->query('/csw:GetRecords');
+
+		$this->assertEquals(1,$rootList->length,"Root element has not been created correctly.");
+
+		$rootnode = $rootList->item(0);
+		$this->assertEquals($rootnode->attributes->getNamedItem('service')->nodeValue,'CSW',"Attribute 'service' has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('version')->nodeValue,'2.0.2',"Attribute 'version' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('resultType')->nodeValue,'results',"Attribute 'results' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('outputSchema')->nodeValue,'csw:IsoRecord',"Attribute 'OutputSchema' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('maxRecords')->nodeValue,15,"Attribute 'maxRecords' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('startPosition')->nodeValue,5,"Attribute 'startPosition' for CSW has not been set correctly.");
 	}
 
-	/**
-	 * Test the testDefaultValuesForSearchTerm
-	 */
-	function testDefaultValuesForSearchTerm() {
-
-		$data = array();
-
-		$data['requestxml']    = "cswGetRecordsSummaryISO_xml";
-		$data['startPosition'] = "0";
-		$data['maxRecords']    = "10";
+	function testRequestDefaultAttributes() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm'   => 'testGetRecordsCommand'
+		);
 
 		$cmd = $this->controller->getCommand("GetRecords", $data);
-		
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$rootList = $xpath->query('/csw:GetRecords');
+
+		$this->assertEquals(1,$rootList->length,"Root element has not been created correctly.");
+
+		$rootnode = $rootList->item(0);
+		$this->assertEquals($rootnode->attributes->getNamedItem('maxRecords')->nodeValue,10,"Default value of attribute 'maxRecords' for CSW has not been set correctly.");
+		$this->assertEquals($rootnode->attributes->getNamedItem('startPosition')->nodeValue,0,"Default value of attribute 'startPosition' for CSW has not been set correctly.");
+	}
+
+	function testRequestWithOneSearchTerm() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm' => 'testSearchQuery'
+		);
+
+		$cmd = $this->controller->getCommand("GetRecords", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$xpath->registerNamespace("ogc", "http://www.opengis.net/ogc");
+
+		$nodelist = $xpath->query('/csw:GetRecords/csw:Query/csw:Constraint/ogc:Filter/ogc:And/ogc:PropertyIsLike/ogc:Literal');
+		$this->assertEquals(1,$nodelist->length,"Filter element has not been created correctly.");
+
+		$node = $nodelist->item(0);
+		$this->assertEquals($node->nodeValue,"%testSearchQuery%","Search term has not been populated correctly.");
+	}
+
+	function testRequestWithMultipleSearchTerms() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm' => 'This is a Search Term'
+		);
+
+		$cmd = $this->controller->getCommand("GetRecords", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$xpath->registerNamespace("ogc", "http://www.opengis.net/ogc");
+
+		$nodelist = $xpath->query('/csw:GetRecords/csw:Query/csw:Constraint/ogc:Filter/ogc:And/ogc:PropertyIsLike/ogc:Literal');
+		$this->assertEquals(5,$nodelist->length,"Filter element has not been created correctly.");
+
+		$node = $nodelist->item(0);
+		$this->assertEquals($node->nodeValue,"%This%","1st search term has not been populated correctly.");
+
+		$node = $nodelist->item(1);
+		$this->assertEquals($node->nodeValue,"%is%","2nd search term has not been populated correctly.");
+
+		$node = $nodelist->item(2);
+		$this->assertEquals($node->nodeValue,"%a%","3rd search term has not been populated correctly.");
+
+		$node = $nodelist->item(3);
+		$this->assertEquals($node->nodeValue,"%Search%","4th search term has not been populated correctly.");
+
+		$node = $nodelist->item(4);
+		$this->assertEquals($node->nodeValue,"%Term%","5th search term has not been populated correctly.");
+	}
+
+	function testRequestWithNoSearchTerm() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml'
+		);
+
+		$cmd = $this->controller->getCommand("GetRecords", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
 		try {
-			$result = $cmd->execute();
+			$cmd->execute();
 		}
 		catch(CreateRequestCommand_Exception $e) {
+			$this->assertEquals($e->getMessage(),'Exception: Undefined searchTerm',"Exception was thrown but with wrong error message.");
 			return;
 		}
 		$this->assertTrue(false,"Exception expected, but hasn't been thrown.");
 	}
 
-	/**
-	 * Test the testDefaultValuesForSearchTerm
-	 */
-	function testDefaultValuesForRequestXML() {
-
-		$data = array();
-
-		$data['searchterm']    = "testGetRecordsCommand";
-		$data['startPosition'] = "0";
-		$data['maxRecords']    = "10";
+	function testRequestWithNoRequestXMLParameter() {
+		$data = array(
+			'searchterm' => 'testGetRecordsCommand'
+		);
 
 		$cmd = $this->controller->getCommand("GetRecords", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
 		try {
-			$result = $cmd->execute();
+			$cmd->execute();
 		}
 		catch(CreateRequestCommand_Exception $e) {
+			$this->assertEquals($e->getMessage(),'Exception: Undefined requestxml',"Exception was thrown but with wrong error message.");
 			return;
 		}
 		$this->assertTrue(false,"Exception expected, but hasn't been thrown.");
 	}
-		
-	/**
-	 * Test the testApostrophySearchTerm
-	 *
-	 *
-	 * This test tests the cswGetRecordsSummaryISO_xml template only.
-	 *
-	 * @see GetRecordsCommand
-	 * @see GetRecordsCommandTest_Controller
-	 */
-	function testApostrophySearchTerm() {
 
-		$data = array();
-		
-		$data['requestxml']    = "cswGetRecordsSummaryISO_xml";
-		$data['searchterm']    = "test'test";
-		$data['startPosition'] = "0";
-		$data['maxRecords']    = "0";
+	function testRequestWithEmptySearchTerm() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm' => ''
+		);
 
 		$cmd = $this->controller->getCommand("GetRecords", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, "<Literal>%test'test%</Literal>");
-		if ($position === false) {
-			$this->assertEquals(1,0,'Invalid literal search term.');
-		}
-	}	
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
 
-	/**
-	 * Test the testLessThanSearchTerm
-	 *
-	 *
-	 * This test tests the cswGetRecordsSummaryISO_xml template only.
-	 *
-	 * @see GetRecordsCommand
-	 * @see GetRecordsCommandTest_Controller
-	 */
-	function testLessThanSearchTerm() {
+		$xml = $cmd->execute();
 
-		$data = array();
-		
-		$data['requestxml']    = "cswGetRecordsSummaryISO_xml";
-		$data['searchterm']    = "test<test";
-		$data['startPosition'] = "0";
-		$data['maxRecords']    = "0";
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$xpath->registerNamespace("ogc", "http://www.opengis.net/ogc");
+
+		$nodelist = $xpath->query('/csw:GetRecords/csw:Query/csw:Constraint/ogc:Filter');
+		$this->assertEquals(1,$nodelist->length,"Filter element has not been created.");
+
+		$nodelist = $nodelist->item(0)->childNodes;
+		$this->assertEquals(1,$nodelist->length,"Filter element has not been created correctly.");
+
+		$node = $nodelist->item(0);
+		$this->assertEquals("#text",$node->nodeName,"Empty filter element has not been created correctly.");
+	}
+
+	function testApostrophyInSearchTerm() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm' => "test'test"
+		);
 
 		$cmd = $this->controller->getCommand("GetRecords", $data);
-		$result = $cmd->execute();
-		
-		$position = strpos($result, "<Literal>%test<test%</Literal>");
-		if ($position === false) {
-			$this->assertEquals(1,0,'Invalid literal search term.');
-		}
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$xpath->registerNamespace("ogc", "http://www.opengis.net/ogc");
+
+		$nodelist = $xpath->query('/csw:GetRecords/csw:Query/csw:Constraint/ogc:Filter/ogc:And/ogc:PropertyIsLike/ogc:Literal');
+		$this->assertEquals(1,$nodelist->length,"Filter element has not been created correctly.");
+
+		$node = $nodelist->item(0);
+		$this->assertEquals($node->nodeValue,"%test'test%","Search term has not been populated correctly.");
+	}
+
+	function testLessThanInSearchTerm() {
+		$data = array(
+			'requestxml' => 'cswGetRecordsSummaryISO_xml',
+			'searchterm' => "test<test"
+		);
+
+		$cmd = $this->controller->getCommand("GetRecords", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GetRecordsCommandTest_Controller',0));
+
+		$xml = $cmd->execute();
+
+		// parse response document
+		$doc  = new DOMDocument();
+		$doc->loadXML($xml);
+		$xpath = new DOMXPath($doc);
+
+		$xpath->registerNamespace("csw", "http://www.opengis.net/cat/csw/2.0.2");
+		$xpath->registerNamespace("ogc", "http://www.opengis.net/ogc");
+
+		$nodelist = $xpath->query('/csw:GetRecords/csw:Query/csw:Constraint/ogc:Filter/ogc:And/ogc:PropertyIsLike/ogc:Literal');
+		$this->assertEquals(1,$nodelist->length,"Filter element has not been created correctly.");
+
+		$node = $nodelist->item(0);
+		$this->assertEquals($node->nodeValue,"%test<test%","Search term has not been populated correctly.");
 	}
 }
 
 
 /**
  * @package geocatalog
- * @subpackage tests
  *
  * Mockup controller class to simulate the GeoNetwork side in this test.
  */
-class GetRecordsCommandTest_Controller extends Controller {
+class GetRecordsCommandTest_Controller extends Controller implements TestOnly {
+
+	private static $allowed_actions = array(
+		'getrecords'
+	);
 
 	/**
 	 * Standard method, not in use.
+	 * @return string
 	 */
 	function index() {
 		BasicAuth::disable();
@@ -220,14 +305,15 @@ class GetRecordsCommandTest_Controller extends Controller {
 	}
 
 	/**
-	 * Returns the request body so that the calling unit test can perform the validation.
+	 * This action returns the post body as a response.
+	 * This way the unit test is able to evaluate the request sent of for testing.
 	 *
-	 * @return string request body
+	 * @param $data
+	 *
+	 * @return mixed
 	 */
 	function getrecords($data) {
-
-		$request = $data->getBody();
-		return $request;
-
+		$result = $data->postVars();
+		return $result[0];
 	}
 }

@@ -6,14 +6,26 @@
  */
 class GnPublishMetadataCommandTest extends SapphireTest {
 
-	/**
-	 * Also uses SimpleNzctFixture in setUp()
-	 */
 	static $fixture_file = 'geocatalogue/tests/GnGetUUIDOfRecordByIDCommandTest.yml';
 
-	static $xsl_path = '';
-	
 	protected $controller = null;
+
+	protected $page = null;
+
+	/**
+	 * @param $url_segment
+	 */
+	public function updateUrlConfiguration($key, $url_segment) {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$config['api_version'] = 'default';
+		$version = $config['api_version'];
+
+		$urlList = $config[$version];
+		$urlList[$key] = $url_segment;
+		$config[$version] = $urlList;
+
+		Config::inst()->update('Catalogue', 'geonetwork', $config);
+	}
 
 	/**
 	 * Initiate the controller and page classes and configure GeoNetwork service
@@ -22,94 +34,113 @@ class GnPublishMetadataCommandTest extends SapphireTest {
 	function setUp() {
 		parent::setUp();
 		
-		$url = Director::absoluteBaseURL() . 'GnPublishMetadataCommandTest_Controller';
-
 		$page = $this->objFromFixture('RegisterDataPage', 'registerdatapage');
-		$page->GeonetworkBaseURL  = $url;
+		$page->GeonetworkBaseURL  = '###';
+		$this->page = $page;
 
-		$this->controller = new CataloguePage_Controller($page);
+		$this->controller = new RegisterDataPage_Controller($page);
 		$this->controller->pushCurrent();
-		
-		//GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
-		GnPublishMetadataCommand::set_api_url('/getrecords?usetestmanifest=1&flush=1');
-		
-		// check from where the test is executed (important when running the
-		// tests via a CI environment.
-		self::$xsl_path = GnPublishMetadataCommand::get_xsl_path();
-		if( in_array('cli-script.php', scandir('.')) ) {
-			// system is in sapphire directory
-			GnPublishMetadataCommand::set_xsl_path('../geocatalogue/xslt/gnInsertResponse.xsl');
-		} else if( in_array('geocatalog', scandir('.'))) {
-			GnPublishMetadataCommand::set_xsl_path('geocatalogue/xslt/gnInsertResponse.xsl');
-		}		
+
+		$this->updateUrlConfiguration('url_publish','/checkrequest');
 	}
 
 	/**
 	 * Remove test controller from global controller-stack.
 	 */
 	function tearDown() {
-		
 		$this->controller->popCurrent();
-
-		GnPublishMetadataCommand::set_xsl_path(self::$xsl_path);
-		
 		parent::tearDown();
 	}
 
-	/**
-	 * Test the GnPublishMetadataCommand
-	 *
-	 */
-	function testGnPublishMetadataCommand() {
+	function testGeoNetworkGroupIsNull() {
+		$this->page->GeonetworkGroupID = null;
 
-		$data = array();
-		$data['gnID'] = 1963;
-		
-		$cmd    = $this->controller->getCommand("GnPublishMetadata", $data);
-		$result = $cmd->execute();
-		
-		$this->assertEquals($result,1963,'GnPublishMetadataCommand returned another ID. It should throw an exception instead.');
-	}
-
-	/**
-	 * Test the GnPublishMetadataCommand with an unexpectes id
-	 *
-	 */
-	function testGnPublishMetadataCommandWithUnexpectedId() {
-
-		$data = array();
-		$data['gnID'] = 2009;
-		
-		$cmd    = $this->controller->getCommand("GnPublishMetadata", $data);
-		try{
-			$result = $cmd->execute();
+		$data = array('gnID' => 1963);
+		$cmd = $this->controller->getCommand("GnPublishMetadata", $data);
+		try {
+			$cmd->execute();
 		}
-		catch(GnPublishMetadataCommand_Exception $e){
+		catch(Exception $e) {
+			$this->assertEquals($e->getMessage(),'Group for record publishing not set correctly. Please contact the system administrator.',"Exception was thrown but with wrong error message.");
 			return;
 		}
-		
-		$this->assertEquals(1,0,'GnPublishMetadataCommand has not thrown a "GeoNetwork publication has failed" exception');
+		$this->assertTrue(false,"Exception expected, but hasn't been thrown.");
 	}
-	/**
-	 * Test the GnPublishMetadataCommand with 0 id
-	 * which leads in a fake-response without an <id> tag
-	* resulting in an exception
-	 */
-	function testGnPublishMetadataCommandWithNullId() {
 
-		$data = array();
-		$data['gnID'] = 1234;
-		
-		$cmd    = $this->controller->getCommand("GnPublishMetadata", $data);
-		try{
-			$result = $cmd->execute();
+	function testPrivilegeIsNull() {
+		$this->page->GeonetworkGroupID = 2;
+		$this->page->Privilege = null;
+
+		$data = array('gnID' => 1963);
+		$cmd = $this->controller->getCommand("GnPublishMetadata", $data);
+		try {
+			$cmd->execute();
 		}
-		catch(GnPublishMetadataCommand_Exception $e){
+		catch(Exception $e) {
+			$this->assertEquals($e->getMessage(),'Privileges for publishing not set correctly. Please contact the system administrator.',"Exception was thrown but with wrong error message.");
 			return;
 		}
-		$this->assertEquals(1,0,'GnPublishMetadataCommand has not thrown a "GeoNetwork ID for the new dataset has not been created" exception');
+		$this->assertTrue(false,"Exception expected, but hasn't been thrown.");
 	}
-	
+
+	function testPrivilegeRequest() {
+		$this->page->GeonetworkGroupID = 2;
+		$this->page->Privilege = '0,1,5';
+
+		$data = array('gnID' => 1963);
+		$cmd = $this->controller->getCommand("GnPublishMetadata", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GnPublishMetadataCommandTest_Controller',0));
+
+		$response = $cmd->execute();
+		try {
+			$cmd->execute();
+		}
+		catch(Exception $e) {
+			$this->assertTrue(false,"An unexpected exception has been thrown.");
+			return;
+		}
+		$this->assertEquals($response,1963,'A different ID has been returned than expected.');
+	}
+
+	function testCommandCatchesUnequalIDs() {
+		$this->updateUrlConfiguration('url_publish','/wrongid');
+
+		$this->page->GeonetworkGroupID = 2;
+		$this->page->Privilege = '0,1,5';
+
+		$data = array('gnID' => 1963);
+		$cmd = $this->controller->getCommand("GnPublishMetadata", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GnPublishMetadataCommandTest_Controller',0));
+
+		try {
+			$cmd->execute();
+		}
+		catch(GnPublishMetadataCommand_Exception $e) {
+			$this->assertEquals('GeoNetwork publication has failed.',$e->getMessage(),"The command did not throw the expected GnPublishMetadataCommand_Exception exception.");
+			return;
+		}
+		$this->assertTrue(0,'An expected exception has not been thrown.');
+	}
+
+	function testCommandCatchesMissingIs() {
+		$this->updateUrlConfiguration('url_publish','/noid');
+
+		$this->page->GeonetworkGroupID = 2;
+		$this->page->Privilege = '0,1,5';
+
+		$data = array('gnID' => 1963);
+		$cmd = $this->controller->getCommand("GnPublishMetadata", $data);
+		$cmd->setRestfulService(new RestfulServiceTest_MockRestfulService('GnPublishMetadataCommandTest_Controller',0));
+
+		try {
+			$cmd->execute();
+		}
+		catch(GnPublishMetadataCommand_Exception $e) {
+			$this->assertEquals('GeoNetwork ID for the new dataset has not been created.',$e->getMessage(),"The command did not throw the expected GnPublishMetadataCommand_Exception exception.");
+			return;
+		}
+		$this->assert('An expected exception has not been thrown.');
+	}
 }
 
 
@@ -121,25 +152,27 @@ class GnPublishMetadataCommandTest extends SapphireTest {
  */
 class GnPublishMetadataCommandTest_Controller extends Controller implements TestOnly {
 
-	/**
-	 * Standard method, not in use.
-	 */
-	function index() {
-		BasicAuth::disable();
-		return "failed";
+	private static $allowed_actions = array(
+		'checkrequest','wrongid','noid'
+	);
+
+	function checkrequest($request) {
+		$vars = $request->postVars();
+		$parameterString = $vars[0];
+
+		$resp=$this->getResponse();
+		$resp->addHeader("Content-Type","text/xml");
+		if ($parameterString === '_1_0=on&_1_1=on&_1_5=on&_2_0=on&_2_1=on&_2_5=on&id=1963') {
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><id>1963</id></response>";
+		}
+		return '<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><message>Parameter String not created properly.</message></response>';
 	}
 
-	/**
-	 * Returns the request body so that the calling unit test can perform the validation.
-	 *
-	 * @return string request body
-	 */
-	function getrecords($httprequest) {
-		$paramid=$_POST['id'];
-		$resp=$this->getResponse();
-		$resp->addHeader("Content-Type","text/xml"); 
-		// if id=0 was given we use this test to force an exception by omitting the <id> tag
-		if($paramid == 1234) return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Failresponse></Failresponse>";
-		return"<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><id>1963</id></response>";
+	function wrongid($request) {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><id>1234</id></response>";
+	}
+
+	function noid($request) {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?><response></response>";
 	}
 }

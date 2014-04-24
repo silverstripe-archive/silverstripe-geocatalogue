@@ -13,13 +13,8 @@ class MDMetadataTest extends SapphireTest {
 	 * @return array
 	 */
 	protected function getTestItem() {
-
 		$mdItem = array();
 		$mdItem['fileIdentifier']          	= trim('11111111-1111-1111-1111-11111111111');
-		$mdItem['metadataStandardName']    	= trim('ISO 19115:2003/19139');
-		$mdItem['metadataStandardVersion'] 	= trim('1.0');
-		$mdItem['MDDateTime']				= '2009-11-01 00:00:00';
-		$mdItem['MDDateType']				= 'publication';
 
 		// create contact array
 		$mdContact = array();
@@ -43,12 +38,6 @@ class MDMetadataTest extends SapphireTest {
 		
 		$mdItem['CIOnlineResources:CIOnlineResource'] = $ciOnlineResources;
 
-		$mdItem['MDAbstract'] = trim('Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
-		$mdItem['MDTitle']    = trim('Sample Dataset');
-
-	//	$mdResourceFormat = array();
-	//	$mdItem['MDResourceFormats:MDResourceFormat'] = $mdResourceFormat;
-
 		$mdResourceConstraints = array();
 		$mdResourceConstraint = array();
 		$mdResourceConstraint['accessConstraints'] = trim('copyright');
@@ -58,15 +47,7 @@ class MDMetadataTest extends SapphireTest {
 		$mdResourceConstraints[] = $mdResourceConstraint;
 		$mdItem['MDResourceConstraints:MDResourceConstraint'] = $mdResourceConstraints;
 		
-		//
-		$mdItem['MDTopicCategory'] = 'biota';
-		$mdItem['MDSpatialRepresentationType'] = 'stereoModel';
-		// Places 	"-180;180;-90;90" => "World",
-		$mdItem['MDWestBound'] = -180;
-		$mdItem['MDEastBound'] = 180;
-		$mdItem['MDSouthBound'] = -90;
-		$mdItem['MDNorthBound'] = 90;
-		
+
 		return $mdItem;
 	}
 
@@ -74,32 +55,50 @@ class MDMetadataTest extends SapphireTest {
 	 * Test the data load method of MDMetadata.
 	 */
 	function testLoadDataWithValidContent() {
-		
 		$metadata  = new MDMetadata();
-		$item      = $this->getTestItem();
-		$metadata->loadData($item);
 
-		$this->assertEquals($metadata->getField('fileIdentifier'), '11111111-1111-1111-1111-11111111111', 'fileIdentifier failed');
-		$this->assertEquals($metadata->getField('metadataStandardName'), 'ISO 19115:2003/19139', 'metadataStandardName failed');
-		$this->assertEquals($metadata->getField('metadataStandardVersion'), '1.0', 'metadataStandardVersion failed');
-		$this->assertEquals($metadata->getField('MDAbstract'), 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.', 'MDAbstract failed');
-		$this->assertEquals($metadata->getField('MDTitle'), 'Sample Dataset', 'MDTitle failed');
+		$mdItem = array();
+		$mdItem['fileIdentifier']          	= trim('11111111-1111-1111');
+		$mdItem['metadataStandardName']    	= trim('ISO 19115:2003/19139');
+		$mdItem['metadataStandardVersion'] 	= trim('1.0');
+
+		$mdItem['MDTitle']    = trim('Sample Dataset');
+		$mdItem['MDAbstract'] = trim('Lorem ipsum dolor sit amet, consectetur adipiscing elit.');
+
+		$mdItem['MDSpatialRepresentationType'] = 'stereoModel';
+		$mdItem['MDWestBound'] = -180;
+		$mdItem['MDEastBound'] = 180;
+		$mdItem['MDSouthBound'] = -90;
+		$mdItem['MDNorthBound'] = 90;
+
+		$metadata->loadData($mdItem);
+
+		$this->assertEquals('11111111-1111-1111', $metadata->getField('fileIdentifier'), 'fileIdentifier failed');
+		$this->assertEquals('ISO 19115:2003/19139', $metadata->getField('metadataStandardName'), 'metadataStandardName failed');
+		$this->assertEquals('1.0', $metadata->getField('metadataStandardVersion'), 'metadataStandardVersion failed');
+
+		$this->assertEquals('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', $metadata->getField('MDAbstract'), 'MDAbstract failed');
+		$this->assertEquals('Sample Dataset', $metadata->getField('MDTitle'), 'MDTitle failed');
 	
+		$this->assertEquals('stereoModel', $metadata->getField('MDSpatialRepresentationType'), 'MDSpatialRepresentationType failed');
+		$this->assertEquals('Sample Dataset', $metadata->getField('MDTitle'), 'MDTitle failed');
+		$this->assertEquals(-180, $metadata->getField('MDWestBound'), 'MDWestBound failed');
+		$this->assertEquals(180, $metadata->getField('MDEastBound'), 'MDEastBound failed');
+		$this->assertEquals(-90, $metadata->getField('MDSouthBound'), 'MDSouthBound failed');
+		$this->assertEquals(90, $metadata->getField('MDNorthBound'), 'MDNorthBound failed');
 	}
 	
 	/**
 	 * Test data load for MDContacts via MDMetadata.
 	 */
 	function testLoadMDContactWithValidContent() {
-		
-		$metadata  = new MDMetadata();
-		$item      = $this->getTestItem();
+		$metadata = new MDMetadata();
+		$item = $this->getTestItem();
 		$metadata->loadData($item);
 
 		$items = $metadata->getComponents('MDContacts');
-		
-		$this->assertTrue(is_a($items,"ComponentSet"));
-		$this->assertEquals($items->TotalItems(),1);
+		$this->assertTrue(is_a($items,"ArrayList"));
+		$this->assertEquals($items->count(),1);
 
 		foreach($items as $item) {
 			$this->assertTrue(is_a($item,"MDContact"));
@@ -113,27 +112,24 @@ class MDMetadataTest extends SapphireTest {
 	 * Test data load for CIOnlineResources via MDMetadata.
 	 */
 	function testLoadCIOnlineResourcesWithValidContent() {
-		
 		$metadata  = new MDMetadata();
 		$item      = $this->getTestItem();
 		$metadata->loadData($item);
 
 		$items = $metadata->getComponents('CIOnlineResources');
 		
-		$this->assertTrue(is_a($items,"ComponentSet"));
-		
-		// 2 items expected
-		$this->assertEquals($items->TotalItems(),2);
+		$this->assertTrue(is_a($items,"ArrayList"));
+		$this->assertEquals($items->count(),2);
 		
 		// iterate through items and test individually
-		$iter = $items->getIterator();
+		$list = $items->toArray();
 		
-		$item = $iter->current();
+		$item = $list[0];
 		$this->assertTrue(is_a($item,"CIOnlineResource"));
 		$this->assertEquals($item->getField('CIOnlineLinkage'),'http://www.mysite.com');
 		$this->assertEquals($item->getField('CIOnlineProtocol'),'WWW:LINK-1.0-http--link');
 
-		$item = $iter->next();
+		$item = $list[1];
 		$this->assertTrue(is_a($item,"CIOnlineResource"));
 		$this->assertEquals($item->getField('CIOnlineLinkage'),'http://www.mysite.com/index.html');
 		$this->assertEquals($item->getField('CIOnlineProtocol'),'WWW:DOWNLOAD-1.0-http--download');
@@ -143,18 +139,14 @@ class MDMetadataTest extends SapphireTest {
 	 * Test data load for MDResourceFormat via MDMetadata.
 	 */
 	function testLoadMDResourceFormatsWithValidContent() {
-		
 		$metadata  = new MDMetadata();
 		$item      = $this->getTestItem();
 		$metadata->loadData($item);
 
 		$items = $metadata->getComponents('MDResourceFormats');
 				
-		$this->assertTrue(is_a($items,"ComponentSet"));
-		
-		// 2 items expected
-		$this->assertEquals($items->TotalItems(),0);
-		
+		$this->assertTrue(is_a($items,"ArrayList"));
+		$this->assertEquals($items->count(),0);
 	}
 		
 	/**
@@ -168,10 +160,8 @@ class MDMetadataTest extends SapphireTest {
 		$metadata->loadData($item);
 		$items = $metadata->getComponents('MDResourceConstraints');
 				
-		$this->assertTrue(is_a($items,"ComponentSet"));
-
-		// 1 item expected
-		$this->assertEquals($items->TotalItems(),1);
+		$this->assertTrue(is_a($items,"ArrayList"));
+		$this->assertEquals($items->count(),1);
 		
 		// iterate through items and test individually
 		$iter = $items->getIterator();
@@ -190,8 +180,7 @@ class MDMetadataTest extends SapphireTest {
 	* CIOnlineResources_HasFirstWebAddress and CIOnlineResources_FirstWebAddress
 	*
 	*/
-	function testCIOnlineResources_WebAddresses(){
-		
+	function testCIOnlineResources_WebAddresses() {
 		MDMetadata::set_online_resource_web_url_filter(
 			array(
 				'WWW:LINK-1.0-http--link'
@@ -201,6 +190,7 @@ class MDMetadataTest extends SapphireTest {
 		$metadata  = new MDMetadata();
 		$item      = $this->getTestItem();
 		$metadata->loadData($item);
+
 		//check the initial values
 		$adresses = $metadata->CIOnlineResources_WebAddresses();
 
@@ -220,7 +210,8 @@ class MDMetadataTest extends SapphireTest {
 
 		$adresses = $metadata->CIOnlineResources_WebAddresses();
 		//We should have an empty DataObjectSet
-		$this->assertTrue(is_a($adresses,"DataObjectSet"),'get a DataObjectSet on invalid data');
+		$this->assertTrue(is_a($adresses,"ArrayList"),'get a DataObjectSet on invalid data');
+
 		//We should have 0 entry with the correct protocol 'WWW:LINK-1.0-http--link'
 		$this->assertEquals($adresses->Count(),0,'Empty DataObjectSet due invalid data');
 		// testing the methods
@@ -232,7 +223,7 @@ class MDMetadataTest extends SapphireTest {
 		$metadata->CIOnlineResources=null;
 		$adresses = $metadata->CIOnlineResources_WebAddresses();
 		//We should have an empty DataObjectSet
-		$this->assertTrue(is_a($adresses,"DataObjectSet"),'get a DataObjectSet on no data');
+		$this->assertTrue(is_a($adresses,"ArrayList"),'get a DataObjectSet on no data');
 		//We should have 0 entry with the correct protocol 'WWW:LINK-1.0-http--link'
 		$this->assertEquals($adresses->Count(),0);
 		// testing the methods
@@ -244,14 +235,12 @@ class MDMetadataTest extends SapphireTest {
 	/**
 	*  check getSpatialRepresentationTypeNice
 	*/
-	function testgetSpatialRepresentationTypeNice()
-	{
+	function testSpatialRepresentationTypeNice() {
 		$metadata  = new MDMetadata();
 		$item      = $this->getTestItem();
+		$item['MDSpatialRepresentationType'] = 'stereoModel';
 		$metadata->loadData($item);
-		//check initial value
-		$this->assertEquals($metadata->MDSpatialRepresentationType,'stereoModel','initial value');
-		
+
 		// make it nice
 		$topic=$metadata->getSpatialRepresentationTypeNice();
 		$this->assertEquals($topic,'Stereo model','on initial value');
@@ -259,7 +248,7 @@ class MDMetadataTest extends SapphireTest {
 		// checking empty value
 		$metadata->MDSpatialRepresentationType='';
 		$topic=$metadata->getSpatialRepresentationTypeNice();
-		$this->assertEquals($topic,MDCodeTypes::$default_for_null_value,'on empty value');
+		$this->assertEquals(MDCodeTypes::$default_for_null_value,$topic,'on empty value');
 		
 		//null-Value should return the default for null
 		$metadata->MDSpatialRepresentationType=null;
@@ -275,10 +264,14 @@ class MDMetadataTest extends SapphireTest {
 	/**
 	*  check getPlaceName
 	*/
-	function testgetPlaceName()
-	{
+	function testgetPlaceName() {
 		$metadata  = new MDMetadata();
 		$item      = $this->getTestItem();
+		$item['MDWestBound'] = -180;
+		$item['MDEastBound'] = 180;
+		$item['MDSouthBound'] = -90;
+		$item['MDNorthBound'] = 90;
+
 		$metadata->loadData($item);
 
 		//check initial value

@@ -2,66 +2,73 @@
 
 class MDCitationDateTest extends SapphireTest {
 	
-	
-	/**
-	 * Checks for method getDateTimeNice with different valid and invalid dates
-	 */
-	function testgetDateTimeNice()
+	function testInitialDatetime()
 	{
 		$date  = new MDCitationDate();
-		
-		$date->MDDateTime = '2009-11-01 00:00:00';
-		$this->assertEquals($date->MDDateTime,'2009-11-01 00:00:00','checking initial value');
-		
-		$dateNice = $date->getDateTimeNice();
-		$this->assertEquals($dateNice,'01/11/2009', 'initial value');
+		$this->assertEquals(null, $date->MDDateTime, 'initial value');
+	}
 
+	function testDatetimeInitialisation() {
+		$date  = new MDCitationDate();
+		$date->MDDateTime = '2009-11-01 00:00:00';
+		$this->assertEquals('2009-11-01 00:00:00', $date->MDDateTime, 'DateTime has not been set correctly.');
+	}
+
+	function testDatetimeNiceInitialValue() {
+		$date  = new MDCitationDate();
+		$dateNice = $date->getDateTimeNice();
+		$this->assertEquals(MDCodeTypes::$default_for_null_value, $dateNice, 'Initial value expected to be default value.');
+	}
+
+	function testDateTimeNice() {
+		$date  = new MDCitationDate();
 		$date->MDDateTime = '1960-01-01 23:24:25';
 		$dateNice = $date->getDateTimeNice();
-		$this->assertEquals($dateNice,'01/01/1960', 'date of other epoc');
+		$this->assertEquals('01/01/1960', $dateNice, 'Date to be expected 01/01/1960');
 
+		$date->MDDateTime = '2014-12-31 00:00:00';
+		$dateNice = $date->getDateTimeNice();
+		$this->assertEquals('31/12/2014', $dateNice, 'Date to be expected 31/12/2014');
+	}
+
+	function testLeapYearForDateTimeNice() {
+		$date  = new MDCitationDate();
+		$date->MDDateTime = '2012-02-29 23:24:25';
+		$dateNice = $date->getDateTimeNice();
+		$this->assertEquals('29/02/2012', $dateNice, 'Date to be expected 01/01/1960');
+	}
+
+	function testFalseLeapYearForDateTimeNice() {
+		$date  = new MDCitationDate();
+		$date->MDDateTime = '2013-02-29 23:24:25';
+		$dateNice = $date->getDateTimeNice();
+		$this->assertEquals('29/02/2013', $dateNice, 'At this stage, SSDateTime and DateTime do not validate date-entries.');
+
+	function testInvalidDateForDateTimeNice() {
+		$date  = new MDCitationDate();
+		$date->MDDateTime = '2013-31-40 25:24:25';
+		$dateNice = $date->getDateTimeNice();
+		$this->assertEquals('40/31/2013', $dateNice, 'At this stage, SSDateTime and DateTime do not validate date-entries.');
+	}
+
+	function testEntryDateTimeNice() {
+		$date  = new MDCitationDate();
 		$date->MDDateTime = '';
 		$dateNice = $date->getDateTimeNice();
-		$this->assertEquals($dateNice,MDCodeTypes::$default_for_null_value, 'empty date value');
+		$this->assertEquals(MDCodeTypes::$default_for_null_value, $dateNice, 'empty date value');
+	}
 
+	function testNULLDateTimeNice() {
+		$date  = new MDCitationDate();
 		$date->MDDateTime = null;
 		$dateNice = $date->getDateTimeNice();
-		$this->assertEquals($dateNice,MDCodeTypes::$default_for_null_value, 'null date value');
-		
-		//checking an empty ssDateTime value. (should be 1.1.1970 00:00:00)  
-		
-		$date->MDDateTime = new SS_Datetime();
-		$dateNice = $date->getDateTimeNice();
-		$this->assertEquals($dateNice,'01/01/1970 12:00pm', 'empty ssDateTime');
+		$this->assertEquals(MDCodeTypes::$default_for_null_value, $dateNice, 'null date value');
 	}
-	
-	/**
-	 * Checks for method getDateTypeNice with several values
-	 *
-	 */
-	function testgetDateTypeNice()
-	{
-		$date  = new MDCitationDate();
-		$date->MDDateType = 'publication';
-		$this->assertEquals($date->MDDateType,'publication','checking initial value');
 
-		$type=$date->getDateTypeNice();
-		$this->assertEquals($type,'Publication', 'initial value');
-		
-		// checking empty value
-		$date->MDDateType='';
-		$type=$date->getDateTypeNice();
-		$this->assertEquals($type,MDCodeTypes::$default_for_null_value, 'empty value');
-		
-		
-		//null-Value should return the default for null
-		$date->MDDateType=null;
-		$type=$date->getDateTypeNice();
-		$this->assertEquals($type,MDCodeTypes::$default_for_null_value,'null value');
-			
-		//checking an invalid value
+	function testInvalidDateTypeNice() {
+		$date  = new MDCitationDate();
 		$date->MDDateType='INVALID_TYPE';
 		$type=$date->getDateTypeNice();
 		$this->assertEquals($type,MDCodeTypes::$default_for_null_value,'invalid value');		
 	}
-}
+}}

@@ -11,6 +11,21 @@ class GetRecordByIdCommandTest extends FunctionalTest {
 	protected $controller = null;
 
 	/**
+	 * @param $url_segment
+	 */
+	public function updateUrlConfiguration($key,$url_segment) {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		$config['api_version'] = 'default';
+		$version = $config['api_version'];
+
+		$urlList = $config[$version];
+		$urlList[$key] = $url_segment;
+		$config[$version] = $urlList;
+
+		Config::inst()->update('Catalogue', 'geonetwork', $config);
+	}
+
+	/**
 	 * Initiate the controller and page classes and configure GeoNetwork service
 	 * to use the mockup-controller for testing.
 	 */
@@ -25,14 +40,7 @@ class GetRecordByIdCommandTest extends FunctionalTest {
 		$this->controller = new BrowsePage_Controller($page);
 		$this->controller->pushCurrent();
 
-		$config = Config::inst()->get('Catalogue', 'geonetwork');
-		$version = $config['api_version'];
-
-		$array = $config[$version];
-		$array['csw_url'] = "/getrecords";
-		$config[$version] = $array;
-
-		Config::inst()->update('Catalogue', 'geonetwork', $config);
+		$this->updateUrlConfiguration('csw_url','/getrecordbyid');
 	}
 
 	/**
@@ -212,22 +220,21 @@ class GetRecordByIdCommandTest extends FunctionalTest {
 
 /**
  * @package geocatalog
- * @subpackage tests
  *
  * Mockup controller class to simulate the GeoNetwork side in this test.
  */
 class GetRecordByIdCommandTest_Controller extends Controller implements TestOnly {
 
 	private static $allowed_actions = array(
-		'getrecords'
+		'getrecordbyid'
 	);
+
 
 	/**
 	 * Standard method, not in use.
 	 * @return string
 	 */
-	function index() {
-		BasicAuth::disable();
+	function index($data) {
 		return "failed";
 	}
 
@@ -239,7 +246,7 @@ class GetRecordByIdCommandTest_Controller extends Controller implements TestOnly
 	 *
 	 * @return mixed
 	 */
-	function getrecords($data) {
+	function getrecordbyid($data) {
 		$result = $data->postVars();
 		return $result[0];
 	}
