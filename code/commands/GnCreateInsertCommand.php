@@ -17,8 +17,17 @@
 class GnCreateInsertCommand extends ControllerCommand {
 
 	static $schema_name = 'GenerateISO19139XML';
-	
-	static $gn_group = "3";
+
+	public function getGeonetworkGoupID() {
+		$controller = $this->getController();
+		$page = $controller->data();
+		$groupID = $page->GeonetworkGroupID;
+
+		if ($groupID == '' || $groupID == null) {
+			throw new Exception('Required GeoNetwork Group-ID for inserting new records is not defined.');
+		}
+		return $groupID;
+	}
 
 	/**
 	 * Command execute
@@ -42,7 +51,7 @@ class GnCreateInsertCommand extends ControllerCommand {
 
 		$data = array();
 		$data['data']       = $xml;
-		$data['group']      = self::$gn_group;
+		$data['group']      = $this->getGeonetworkGoupID();
 		$data['template']   = "n";
 		$data['title']      = "";
 		$data['category']   = "_none_";
