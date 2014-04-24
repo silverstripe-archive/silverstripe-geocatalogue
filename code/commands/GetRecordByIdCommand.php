@@ -34,10 +34,8 @@ class GetRecordByIdCommand extends GnAuthenticationCommand {
 		$data       = $this->getParameters();
 
 		// generate GeoNetwork HTTP request (query metadata).
-		$cmd = null;
-		
 		$cmd = $this->getController()->getCommand("CreateRecordByIdRequest", $data);
-		$xml = $cmd->execute($this->get_catalogue_url());
+		$xml = $cmd->execute();
 
 		// send request to GeoNetwork
 		$restfulService = $this->getRestfulService();
