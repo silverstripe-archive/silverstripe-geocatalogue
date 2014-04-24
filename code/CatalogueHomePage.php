@@ -72,7 +72,7 @@ class CatalogueHomePage extends Page {
 	 * Populate the additional field.
 	 * @return Fieldset 
 	 */
-	function getCMSFields() {
+	public function getCMSFields() {
 		$fields = parent::getCMSFields();
 		
 		$pagesSearch = CatalogueHomePage::get_page_subclasses('CataloguePage');
@@ -101,21 +101,22 @@ class CatalogueHomePage extends Page {
  */
 class CatalogueHomePage_Controller extends Page_Controller {
 
-
 	/**
-	 * Initialisation function that is run before any action on the controller is called.
+	 * Initialises the controller for any action on this controller.
 	 */
 	public function init() {
 		parent::init();
 		$this->extend('extendInit');
 	}
 
-
+	/**
+	 * Action to render the index-page.
+	 * @param $data
+	 *
+	 * @return string
+	 */
 	public function index($data) {
 		$html = $this->render();
-
         return $html;
 	}
 }
-
-?>

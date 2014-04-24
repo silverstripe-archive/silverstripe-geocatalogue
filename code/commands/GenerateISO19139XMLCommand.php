@@ -1,36 +1,36 @@
 <?php
 /**
  * @author Rainer Spittel (rainer at silverstripe dot com)
- * @package geocatalog
- * @subpackage commands
+ * @package geocatalogue
  */
 
 /**
- * Create a ISO19139 Metadata XML file
+ * Create a ISO19139 Metadata XML document.
  *
- * This command generates a ISO19139 metadata XML file.
+ * This command generates a ISO19139 metadata XML document. It can be used
+ * to insert/update records in a remote GeoNetwork server.
  */
 class GenerateISO19139XMLCommand extends ControllerCommand {
 	
 	/**
-	 * @var string $templatename template to generate a valid OGC update request.
+	 * @var string $templatename path to template used to generate the XML document.
 	 */
 	static $templatename = 'cswISO19139_xml';
 	
 	/**
-	 * Command execute
+	 * Execute the command to generate the ISO19139 metadata XML.
 	 *
-	 * Generate the ISO19139 metadata XML and return it.
+	 * @return HTMLText
+	 * @throws GenerateISO19139XMLCommand_Exception
 	 */
 	public function execute() {
 		
-		$data       = $this->getParameters();
+		$data = $this->getParameters();
 		if(! isset($data['MDMetadata'])){
 			throw new GenerateISO19139XMLCommand_Exception("No data-object given");
 		}
 		
 		$MDMetadata = $data['MDMetadata'];
-		
 		if(!is_a($MDMetadata,'MDMetadata')){
 			throw new GenerateISO19139XMLCommand_Exception("data-object is not a MDMetadata");
 		}
@@ -38,15 +38,14 @@ class GenerateISO19139XMLCommand extends ControllerCommand {
 		$requestXML = self::$templatename;
 
 		$obj = new ViewableData();
-
 		$obj->customise($MDMetadata);
-		$data = $obj->renderWith($requestXML);
 
-		return $data;		
+		return $obj->renderWith($requestXML);;
 	}	
 }
 
 /**
+ * Class GenerateISO19139XMLCommand_Exception
  * Customised exception class
  */
 class GenerateISO19139XMLCommand_Exception extends Exception {}
