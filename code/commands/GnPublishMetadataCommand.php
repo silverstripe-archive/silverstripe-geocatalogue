@@ -31,10 +31,7 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 		$data       = $this->getParameters();
 		$gnID 		= $data['gnID'];
 
-		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-		if ($this->getUsername() ) {
-			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
-		}
+		$restfulService = $this->getRestfulService();
 
 		// build the parameters for the publish request. It is a structure of
 		// a geonetwork form to publish the data to non-registered users and
@@ -65,8 +62,8 @@ class GnPublishMetadataCommand extends GnAuthenticationCommand {
 
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
-		$headers     = array('Content-Type: application/x-www-form-urlencoded');
-		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);
+		$headers = array('Content-Type: application/x-www-form-urlencoded');
+		$response = $restfulService->request($this->get_catalogue_url(),'POST',$params, $headers);
 		$responseXML = $response->getBody();
 
         // read GeoNetwork ID from the response-XML document

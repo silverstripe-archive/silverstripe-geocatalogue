@@ -39,15 +39,10 @@ class GetRecordsCommand extends GnAuthenticationCommand {
 		$xml = $cmd->execute();
 
 		// send requrest to GeoNetwork
-		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-		if ($this->getUsername() ) {
-			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
-		}
+		$restfulService = $this->getRestfulService();
 
 		$headers     = array('Content-Type: application/xml');
-		$response    = $this->restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
-		
-		$responseXML = $response->getBody();
-		return $responseXML;
+		$response    = $restfulService->request($this->get_catalogue_url(),'POST',$xml, $headers);
+		return $response->getBody();
 	}
 }
