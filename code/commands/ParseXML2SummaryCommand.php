@@ -22,6 +22,9 @@ class ParseXML2SummaryCommand  extends ParseXMLCommand {
 
         $responseDOM = $xpath->query('/csw:GetRecordsResponse');
 
+	    if($responseDOM->length == 0) {
+		    throw new ParseXMLCommand_Exception('Invalid response, contains no GetRecordsResponse node.');
+	    }
 	    $searchResultList = $xpath->query('csw:SearchResults',$responseDOM->item(0));
 
 	    $searchResultItem = $searchResultList->item(0);
@@ -214,3 +217,5 @@ class ParseXML2SummaryCommand  extends ParseXMLCommand {
 		return $mdItem;
 	}
 }
+
+class ParseXML2SummaryCommand_Exception extends Exception {}
