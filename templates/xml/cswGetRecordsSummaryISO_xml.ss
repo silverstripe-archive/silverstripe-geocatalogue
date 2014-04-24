@@ -21,7 +21,7 @@
 							<% loop WordsToSearchFor %>
 								<PropertyIsLike wildCard="%" singleChar="_" escapeChar="\">
 									<PropertyName>AnyText</PropertyName>
-									<Literal>%$word%</Literal>
+									<Literal><![CDATA[%$word%]]></Literal>
 								</PropertyIsLike>
 							<% end_loop %>
 
