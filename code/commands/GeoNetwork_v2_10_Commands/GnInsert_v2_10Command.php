@@ -121,6 +121,7 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		$data['gnID'] = $gnID;
 		$data['UUID'] = $uuid;
 
+
 		// @2to resolve once GeoNetwork is fixed
 		// BAD HACK TO WORK AROUND SEVERAL GEONETWORK 2.10 BUGS
 		{
@@ -128,6 +129,8 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 			// I make a FORM submission on the GeoNetwork User Interface with the
 			// UUID data added to the XML and then parse if I receive a Form back to verify
 			// the submission was successful.
+			$disable_error_handling = Config::inst()->get('Catalogue', 'disable_geonetwork_error_handling_for_update');
+
 			$metadata = $this->doMetadata;
 			$metadata->fileIdentifier = $uuid;
 
@@ -136,20 +139,22 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 
 			$response    = $this->restfulService->request('srv/eng/metadata.update','POST',$result, $headers);
 
-			if ($response->getStatusCode() != 200) {
-				throw new GeonetworkInsertCommand_Exception('HTTP request return following response code: '.$response->getStatusCode().' - '.$response->getStatusDescription());
-			}
-
-			// Spot check for some data in the response. We do not parse the html page completely.
-			// The check verifies if the form-label for field identifier exists and if the uuid appears.
-			{
-				$responseXML = $response->getBody();
-				if (strpos($responseXML, "gmd:fileIdentifier|gmd:MD_Metadata|gmd:MD_Metadata/gmd:") === false ) {
-					throw new GeonetworkInsertCommand_Exception('The global file identifier has not been created. Please contact your system administrator.');
+			if ($disable_error_handling != true) {
+				if ($response->getStatusCode() != 200) {
+					throw new GeonetworkInsertCommand_Exception('HTTP request return following response code: '.$response->getStatusCode().' - '.$response->getStatusDescription());
 				}
 
-				if (strpos($responseXML, $uuid) === false ) {
-					throw new GeonetworkInsertCommand_Exception('The global file identifier has not been created. Please contact your system administrator.');
+				// Spot check for some data in the response. We do not parse the html page completely.
+				// The check verifies if the form-label for field identifier exists and if the uuid appears.
+				{
+					$responseXML = $response->getBody();
+					if (strpos($responseXML, "gmd:fileIdentifier|gmd:MD_Metadata|gmd:MD_Metadata/gmd:") === false ) {
+						throw new GeonetworkInsertCommand_Exception('The global file identifier has not been created. Please contact your system administrator.');
+					}
+
+					if (strpos($responseXML, $uuid) === false ) {
+						throw new GeonetworkInsertCommand_Exception('The global file identifier has not been created. Please contact your system administrator.');
+					}
 				}
 			}
 

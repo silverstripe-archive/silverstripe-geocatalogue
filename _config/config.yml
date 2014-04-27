@@ -17,6 +17,8 @@ Catalogue:
   # of the website.
   'email_sender': ''
 
+  'disable_geonetwork_error_handling_for_update' : true
+
   standard_definitions:
     iso:
       'name': 'ISO19139'
