@@ -56,7 +56,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 	 * @return int GeoNetwork internal ID
 	 */
 	public function execute() {
-		
+
 		$controller = Controller::curr();
 
 		// get GeoNetwork Page type
@@ -138,7 +138,7 @@ class GnInsertCommand extends GnAuthenticationCommand {
 		$this->uuid = $uuid;
 
 		// return the geonetwork id of the new entry.
-		return $gnID;		
+		return $gnID;
 	}
 }
 

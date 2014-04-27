@@ -24,7 +24,6 @@ class CreateRecordByIdRequestCommand extends ControllerCommand {
 	 * @return string - XML CSW requests which can be used to access an OGC CSW 2.0.1 web service.
 	 */
 	public function execute() {
-		
 		$data       = $this->getParameters();
 		$requestXML = $data['requestxml'];
 		$fileIdentifier = $data['fileIdentifier'];
