@@ -200,13 +200,15 @@ class MDMetadata extends MDDataObject {
 		$result = '';
 		foreach ($this->MDCitationDates() as $date) {
 			if ($date != NULL) {
-				$tempDate= $date->MDDateTime;
 				// expected format by jQuery-UI datepicker: '2014-02-04 00:00:00'
-				$dateParts=explode(' ',$tempDate);
+				$dateParts=explode('T',$date->MDDateTime);
+				if (sizeof($dateParts) != 2) {
+					$dateParts=explode(' ',$date->MDDateTime);
+				}
 				$dateParts=explode('-',$dateParts[0]);
-				$tempDate = $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0];
+				$temp = $dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0];
+				$result = date('c', strtotime($temp));
 
-				$result = date('c', strtotime($tempDate));
 				if ($date->MDDateType == $dateType) {
 					return $result;
 				}
