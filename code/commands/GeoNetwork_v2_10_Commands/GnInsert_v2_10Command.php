@@ -178,6 +178,7 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		// generate update GeoNetwork HTTP request (query metadata).
 		if ($this->get_automatic_publishing()) {
 			$cmd = $this->getController()->getCommand("GnPublishMetadata_v2_10", $data);
+			$cmd->setRestfulService($this->restfulService);
 			$cmd->setUsername($page->Username);
 			$cmd->setPassword($page->Password);
 			$cmd->execute();
