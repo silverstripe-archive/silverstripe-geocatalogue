@@ -47,8 +47,12 @@ Catalogue:
       geonetwork_url: 'srv/en/xml.metadata'
       url_publish: 'srv/en/xml.metadata.privileges' # see GnPublishMetadataCommand
       url_getuuid: 'srv/en/xml.metadata.get' # GnGetUUIDOfRecordByIDCommand
+      url_gninsert: 'srv/en/xml.metadata.insert' # see GnInsertCommand
 
     geonetwork_v2_10:
       csw_url: 'srv/eng/csw'
       geonetwork_url: 'srv/eng/xml.metadata'
       url_publish: 'srv/eng/metadata.admin' # see GnPublishMetadata_v2_10Command
+      url_getuuid: '' # obselete, GnGetUUIDOfRecordByIDCommand not required
+      url_gninsert: 'srv/eng/xml.metadata.insert' # see GnInsert_v2_10Command
+      url_gnupdate: 'srv/eng/metadata.update' # see GnInsert_v2_10Command (!)
