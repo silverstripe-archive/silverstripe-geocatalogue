@@ -45,8 +45,8 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 
 	public function get_api_url() {
 		$config = Config::inst()->get('Catalogue', 'geonetwork');
-		$version = $config['api_version'];
-		return $config[$version]['geonetwork_url'].'.insert';
+		return $config[$config['api_version']]['url_gninsert'];
+	}
 	}
 
 	public function get_automatic_publishing() {
@@ -150,6 +150,7 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 			$response    = $this->restfulService->request('srv/eng/metadata.update','POST',$result, $headers);
 
 			if ($disable_error_handling != true) {
+
 				if ($response->getStatusCode() != 200) {
 					throw new GeonetworkInsertCommand_Exception('HTTP request return following response code: '.$response->getStatusCode().' - '.$response->getStatusDescription());
 				}
