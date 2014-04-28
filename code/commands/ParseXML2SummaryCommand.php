@@ -102,10 +102,16 @@ class ParseXML2SummaryCommand  extends ParseXMLCommand {
 				$mdItem['MDAbstract'] = stripslashes($item->item(0)->nodeValue);
 			}
 
-			$item = $xpath->query('gmd:topicCategory/gmd:MD_TopicCategoryCode', $dataIdentification);
-			if($item->length > 0) {
-				$mdItem['MDTopicCategory'] = $item->item(0)->nodeValue;
+			$mdTopicCategory = array();
+			$xmlCategoryList = $xpath->query('gmd:topicCategory/gmd:MD_TopicCategoryCode', $dataIdentification);
+			foreach($xmlCategoryList as $category) {
+				if(trim($category->nodeValue)) {
+					$mdTopicCategoryItem = array();
+					$mdTopicCategoryItem['Value'] = trim($category->nodeValue);
+					$mdTopicCategory[] = $mdTopicCategoryItem;
+				}
 			}
+			$mdItem['MDTopicCategory:MDTopicCategory'] = $mdTopicCategory;
 
 			$extendList = $xpath->query('gmd:extent/gmd:EX_Extent', $dataIdentification);
 			foreach($extendList as $extendNode) {
