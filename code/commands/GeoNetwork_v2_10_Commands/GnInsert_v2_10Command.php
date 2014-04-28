@@ -131,7 +131,6 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		$data['gnID'] = $gnID;
 		$data['UUID'] = $uuid;
 
-
 		// @2to resolve once GeoNetwork is fixed
 		// BAD HACK TO WORK AROUND SEVERAL GEONETWORK 2.10 BUGS
 		{
@@ -149,7 +148,6 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 
 
 			$response    = $restfulService->request($this->get_api_update_url(),'POST',$result, $headers);
-
 			if ($disable_error_handling != true) {
 
 				if ($response->getStatusCode() != 200) {
@@ -160,6 +158,7 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 				// The check verifies if the form-label for field identifier exists and if the uuid appears.
 				{
 					$responseXML = $response->getBody();
+
 					if (strpos($responseXML, "gmd:fileIdentifier|gmd:MD_Metadata|gmd:MD_Metadata/gmd:") === false ) {
 						throw new GeonetworkInsertCommand_Exception('The global file identifier has not been created. Please contact your system administrator.');
 					}
@@ -179,11 +178,10 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		if ($this->get_automatic_publishing()) {
 			$cmd = $this->getController()->getCommand("GnPublishMetadata_v2_10", $data);
 			$cmd->setRestfulService($this->restfulService);
-			$cmd->setUsername($page->Username);
-			$cmd->setPassword($page->Password);
 			$cmd->execute();
 			$this->published = true;
 		}
+
 		$this->gnID = $gnID;
 		$this->uuid = $uuid;
 
