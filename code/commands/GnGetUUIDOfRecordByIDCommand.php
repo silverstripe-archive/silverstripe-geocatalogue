@@ -23,6 +23,7 @@ class  GnGetUUIDOfRecordByIDCommand extends GnAuthenticationCommand {
 		$config = Config::inst()->get('Catalogue', 'geonetwork');
 		return $config[$config['api_version']]['url_getuuid'];
 	}
+
 	/**
 	 * Command execute
 	 *

@@ -53,7 +53,8 @@ class MDContact extends MDDataObject {
 	}
 
 	public function getFirstElectronicMailAddress() {
-		$dos = $this->MDElectronicMailAddress();	
+
+		$dos = $this->MDElectronicMailAddress();
 		if ($dos->First()) {
 			return $dos->First();
 		} 

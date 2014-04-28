@@ -33,9 +33,14 @@ class GnInsertCommand extends GnAuthenticationCommand {
 	
 	public function get_api_url() {
 		$config = Config::inst()->get('Catalogue', 'geonetwork');
-		$version = $config['api_version'];
-		return $config[$version]['geonetwork_url'].'.insert';
+		return $config[$config['api_version']]['url_gninsert'];
 	}
+//
+//	public function get_api_url() {
+//		$config = Config::inst()->get('Catalogue', 'geonetwork');
+//		$version = $config['api_version'];
+//		return $config[$version]['geonetwork_url'].'.insert';
+//	}
 
 	public function get_automatic_publishing() {
 		$controller = $this->getController();
