@@ -11,6 +11,8 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 
 	private $uuid = null;
 
+	private $published = false;
+
 	private $doMetadata = null;
 
 	/**
@@ -27,6 +29,14 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 	 */
 	public function get_gnid() {
 		return $this->gnID;
+	}
+
+	/**
+	 * Returns the GeoNetwork internal ID of the new metadata record.
+	 * @return int
+	 */
+	public function get_published() {
+		return $this->published;
 	}
 
 	public function setDOMetadata($metadata) {
@@ -169,6 +179,7 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 			$cmd->setUsername($page->Username);
 			$cmd->setPassword($page->Password);
 			$cmd->execute();
+			$this->published = true;
 		}
 		$this->gnID = $gnID;
 		$this->uuid = $uuid;
