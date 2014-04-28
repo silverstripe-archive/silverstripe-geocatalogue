@@ -47,6 +47,10 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		$config = Config::inst()->get('Catalogue', 'geonetwork');
 		return $config[$config['api_version']]['url_gninsert'];
 	}
+
+	public function get_api_update_url() {
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		return $config[$config['api_version']]['url_gnupdate'];
 	}
 
 	public function get_automatic_publishing() {
@@ -76,16 +80,12 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 		$data = $this->getParameters();
 		$params = $data['RequestParameter'];
 
-		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-		$this->restfulService->setConnectTimeout(10);
-		if ($this->getUsername() ) {
-			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
-		}
+		$restfulService = $this->getRestfulService();
 
 		// insert metadata into GeoNetwork
 		$headers = array('Content-Type: application/x-www-form-urlencoded');
 
-		$response    = $this->restfulService->request($this->get_api_url(),'POST',$params, $headers);
+		$response    = $restfulService->request($this->get_api_url(),'POST',$params, $headers);
 		$responseXML = $response->getBody();
 
 		// We expect a status code of 200 for the insert/getrecords and getrecordsbyid requests.
@@ -147,7 +147,8 @@ class GnInsert_v2_10Command extends GnAuthenticationCommand {
 			$cmd = $this->getController()->getCommand("GnCreateUpdate", array('MDMetadata' => $metadata, 'id' => $gnID, 'version' => 1));
 			$result = $cmd->execute();
 
-			$response    = $this->restfulService->request('srv/eng/metadata.update','POST',$result, $headers);
+
+			$response    = $restfulService->request($this->get_api_update_url(),'POST',$result, $headers);
 
 			if ($disable_error_handling != true) {
 
