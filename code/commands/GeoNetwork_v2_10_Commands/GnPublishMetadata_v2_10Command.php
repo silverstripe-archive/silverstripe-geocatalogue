@@ -11,7 +11,8 @@
 class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 
 	public function get_api_url() {
-		return 'srv/eng/metadata.admin';
+		$config = Config::inst()->get('Catalogue', 'geonetwork');
+		return $config[$config['api_version']]['url_publish'];
 	}
 
 	/**
@@ -21,10 +22,7 @@ class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 		$data       = $this->getParameters();
 		$gnID 		= $data['gnID'];
 
-		$this->restfulService = new RestfulService($this->getController()->getGeoNetworkBaseURL(),0);
-		if ($this->getUsername() ) {
-			$this->restfulService->basicAuth($this->getUsername(), $this->getPassword());
-		}
+		$restfulService = $this->getRestfulService();
 
 		$controller = $this->getController();
 		$page = $controller->data();
@@ -52,7 +50,7 @@ class GnPublishMetadata_v2_10Command extends GnAuthenticationCommand {
 
 		$params = GnCreateInsertCommand::implode_with_keys($data);
 
-		$response    = $this->restfulService->request($this->get_api_url()."?".$params,'GET');
+		$response    = $restfulService->request($this->get_api_url()."?".$params,'GET');
 		$responseXML = $response->getBody();
 
         // read GeoNetwork ID from the response-XML document
