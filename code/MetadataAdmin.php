@@ -9,9 +9,15 @@
  * 
  */
 class MetadataAdmin extends ModelAdmin {
+
+	private static $menu_icon = 'geocatalogue/images/16x16/catalogue.png';
+
 	static $menu_title = "Metadata";
+
 	static $url_segment = "metadata";
-	
+
+	public $showImportForm = false;
+
 	function init(){
 		parent::init();
 	}
