@@ -150,6 +150,8 @@ class CataloguePage_Controller extends Page_Controller {
         try {
             $query->validate();
         } catch (CataloguePage_Exception $exception) {
+			var_dump("1");
+	        var_dump($exception);die();
             $this->redirectBack();
             return;
         }
@@ -189,6 +191,11 @@ class CataloguePage_Controller extends Page_Controller {
 	   			Debug::message($prefix . ".errors.message", $mess);
 		        return;
 			}
+
+		        var_dump("2");
+	            var_dump($responseXML);
+	     	    var_dump($exception);die();
+
             // @todo better error handling
             $this->redirectBack();
             return;
