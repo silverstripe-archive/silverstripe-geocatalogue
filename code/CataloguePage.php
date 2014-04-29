@@ -172,6 +172,10 @@ class CataloguePage_Controller extends Page_Controller {
         $cmd->setPassword($this->owner->GeonetworkPassword);
         $responseXML = $cmd->execute();
 
+	    if(isset($_REQUEST['debugRequest'])) {
+			Debug::message($responseXML);
+        }
+
         // parse response
         try {
             $resultSet = $this->parseResponse($format, $responseXML, $query->get('searchTerm'));
@@ -181,6 +185,10 @@ class CataloguePage_Controller extends Page_Controller {
             Session::set($prefix . ".errors.message", $mess);
             Session::set($prefix . ".errors.messageType", 'Error');
 
+	        if(isset($_REQUEST['debugRequest'])) {
+	   			Debug::message($prefix . ".errors.message", $mess);
+		        return;
+			}
             // @todo better error handling
             $this->redirectBack();
             return;
