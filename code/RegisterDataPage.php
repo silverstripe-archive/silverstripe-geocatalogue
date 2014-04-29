@@ -353,6 +353,64 @@ class RegisterDataPage_Controller extends Page_Controller
 
 
 	/**
+	*  getTheSessionMessage()
+	*
+	* Returns the first Session-Error-Message  for the given page
+	*
+	* @return string The Session-Message
+	*				or empty string if there's none
+	*/
+	public function getTheSessionMessage(){
+		$formerrors=Session::get($this->prefixx() . '.errors');
+		$message='';
+		if(isset($formerrors) && is_array($formerrors)) {
+			if(isset($formerrors[0])){
+				$message= $formerrors[0]['message'];
+			}
+			else{
+				$message= $formerrors['message'];
+			}
+		}
+		return $message;
+	}
+
+
+	/**
+	*  getTheSessionMessageType()
+	*
+	* Returns the first Session-Error-MessageType  for the given page
+	* The Session-Message-Type can be 'Info','Warning','Error' or 'Validation'
+	*
+	* @return string The Session-Message-Type
+	*				or empty string if there's none
+	*/
+	public function getTheSessionMessageType(){
+		$formerrors=Session::get($this->prefixx() . '.errors');
+		$type='';
+		if(isset($formerrors) && is_array($formerrors)) {
+			if(isset($formerrors[0])){
+				$type= $formerrors[0]['messageType'];
+			}
+			else{
+				$type= $formerrors['messageType'];
+			}
+		}
+		return $type;
+	}
+
+	/**
+	*  clearTheSessionMessage()
+	*
+	* Clears all the Session-Errors for the given page
+	*
+	*/
+	public function clearTheSessionMessage(){
+		$prefix=$this->prefixx();
+		Session::clear($prefix .'.errors');
+	}
+
+
+	/**
 	 *  prefixx()
 	 *
 	 * Returns the first prefix to be used with the Session::get and ::set

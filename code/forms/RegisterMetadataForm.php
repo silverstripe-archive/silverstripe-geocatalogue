@@ -155,6 +155,7 @@ class RegisterMetadataForm extends Form {
 			            'MDTitle', 'MDAbstract', 'MDElectronicMailAddress', 'MDDateTime', 'MDTopicCategory'
 			        );
 		}
+
 		parent::__construct($controller, $name, $fields, $actions, $validator);
 	}
 	
