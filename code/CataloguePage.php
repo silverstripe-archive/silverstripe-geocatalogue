@@ -33,8 +33,8 @@ class CataloguePage extends Page {
         $fields->addFieldsToTab('Root.Catalog', array(
 	        $gnfields = new CompositeField(array(
 	   						$url = new TextField('GeonetworkBaseURL', 'URL'),
-	   						$user = new TextField('Username','Username'),
-	   						$pass = new PasswordField('Password','Password'),
+	   						$user = new TextField('GeonetworkUsername','Username'),
+	   						$pass = new PasswordField('GeonetworkPassword','Password'),
 						    $results = new TextField('ResultsPerSearchPage', 'Results per page:'
 	   		)))
         ));
@@ -45,10 +45,10 @@ class CataloguePage extends Page {
 	    $config = SiteConfig::current_site_config();
         if ($config->CatalogueSettingReadonly) {
             $fields->makeFieldReadonly('GeonetworkBaseURL');
-            $fields->makeFieldReadonly('Username');
+            $fields->makeFieldReadonly('GeonetworkUsername');
             $fields->makeFieldReadonly('ResultsPerSearchPage');
 
-            $fields->removeByName('Password');
+            $fields->removeByName('GeonetworkPassword');
         } else {
 	        $url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
             $user->setDescription('Geonetwork user name.');
