@@ -81,15 +81,21 @@ class CatalogueHomePage extends Page {
 
 		$fields->addFieldsToTab('Root.Catalog',
 			array( 
-				new DropdownField('SearchPageName','Use this page as search page (must be of type "Catalogue Page")',$pagesSearch),				// drop down				
-				new DropdownField('BrowsePageName','Use this page as browse page (must be of type "Browse Page")',$pagesBrowse),				// drop down				
-				new DropdownField('SubmitDataPageName','Use this page as submit data page (must be of type "Register Data Page")',$pagesRegister),	// drop down				
-			));		
+				$search = new DropdownField('SearchPageName','Search Page',$pagesSearch),				// drop down
+				$browse = new DropdownField('BrowsePageName','Browse Page',$pagesBrowse),				// drop down
+				$submit = new DropdownField('SubmitDataPageName','Submit Page',$pagesRegister),	        // drop down
+			)
+		);
 
-		if (CataloguePage::get_site_status() != 'setup') {
+		$config = SiteConfig::current_site_config();
+		if ($config->CatalogueSettingReadonly) {
 			$fields->makeFieldReadonly('SearchPageName');
 			$fields->makeFieldReadonly('BrowsePageName');
 			$fields->makeFieldReadonly('SubmitDataPageName');
+		} else {
+			$search->setDescription('Use this page as search page (must be of type "Catalogue Page")');
+			$browse->setDescription('Use this page as browse page (must be of type "Browse Page")');
+			$submit->setDescription('Use this page as submit data page (must be of type "Register Data Page")');
 		}
 		
 		return $fields;

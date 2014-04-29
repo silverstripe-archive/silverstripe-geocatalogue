@@ -20,20 +20,7 @@ class CataloguePage extends Page {
                               'GeonetworkPassword' => "Varchar");
 
     static $defaults = array('ResultsPerSearchPage' => 10);
-    /**
-     * This variable defines the status of the website. If it is set to
-     * 'setup', the GoeNetwork configuration fields are editable. Otherwise
-     * it will be set to read-only. Just a security precaution to prevent
-     * users to change the GeoNetwork configuration by accident.
-     * @var string
-     */
-	public static function set_site_status($value) {
-	    return Config::inst()->update('Catalogue', 'site_status',$value);
-    }
 
-	public static function get_site_status() {
-        return Config::inst()->get('Catalogue', 'site_status');
-    }
     /**
      *
      * @return FieldList
@@ -55,17 +42,18 @@ class CataloguePage extends Page {
 		$gnfields->setTag('fieldset');
 		$gnfields->setLegend('<h3>GeoNetwork Configurations</h3>');
 
-		$url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
-		$user->setDescription('Geonetwork user name.');
-		$pass->setDescription('Geonetwork password.');
-	    $results->setDescription('Define how many results per page shell be shown (1 .. 99).');
-
-        if (CataloguePage::get_site_status() != 'setup') {
+	    $config = SiteConfig::current_site_config();
+        if ($config->CatalogueSettingReadonly) {
             $fields->makeFieldReadonly('GeonetworkBaseURL');
-            $fields->makeFieldReadonly('GeonetworkUsername');
+            $fields->makeFieldReadonly('Username');
             $fields->makeFieldReadonly('ResultsPerSearchPage');
 
-            $fields->removeByName('GeonetworkPassword');
+            $fields->removeByName('Password');
+        } else {
+	        $url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
+            $user->setDescription('Geonetwork user name.');
+            $pass->setDescription('Geonetwork password.');
+            $results->setDescription('Define how many results per page shell be shown (1 .. 99).');
         }
         // return the modified fieldset.
         return $fields;

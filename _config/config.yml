@@ -1,6 +1,11 @@
 ---
 Name: geonetconfig
 ---
+
+SiteConfig:
+  extensions:
+    - CatalogueSiteConfig
+
 Catalogue:
   'metadata_standard': 'iso'
 
@@ -9,8 +14,6 @@ Catalogue:
   'search_form': 'CatalogueSearchForm'
 
   'cssfile': 'geocatalogue/css/cataloguepage.css'
-
-  'site_status': 'setup'
 
   # Email_sender used for all emails send out by the catalogue module as a sender. This includes
   # Confirmation emails to the website user who registers new records and notifications to the maintainer

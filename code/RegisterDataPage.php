@@ -89,11 +89,8 @@ class RegisterDataPage extends Page
 					$redirect = new DropdownField('RedirectOnSuccess','Redirect to',$pagesSearch)
 				));
 
-		$autopublish->setDescription('Set this option to enable automatic record publishing for new records. If enabled, privileges must be set.');
 		$user->setAttribute("autocomplete",'off');
 		$pass->setAttribute("autocomplete",'off');
-		$gnGroupDropdown->setDescription('The GeoNetwork group defines the user group who owns new created records. It is a mandatory field.');
-		$checkboxset->setDescription('Once a record has been added to the catalog, define how the permissions to this records shall be set for public users.');
 
 		$grpfields->setTag('fieldset');
 		$grpfields->setLegend('<h3>Dataset Permissions</h3>');
@@ -104,17 +101,36 @@ class RegisterDataPage extends Page
 		$gnfields->setTag('fieldset');
 		$gnfields->setLegend('<h3>GeoNetwork Configurations</h3>');
 
-		$url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
-		$user->setDescription('Geonetwork user name.<br>'.'The user must be defined in GeoNetwork. All new records created via this page will be owned by this user in Geonetwork.');
-		$pass->setDescription('Geonetwork password.');
-
 		$emailfields->setTag('fieldset');
 		$emailfields->setLegend('<h3>EMail Settings</h3>');
 
-		$name->setDescription('Name of the person who gets notified when new records are submitted.');
-		$email->setDescription('Email address of that person who receives the notifications.');
+		$config = SiteConfig::current_site_config();
+		if ($config->CatalogueSettingReadonly) {
+			$fields->makeFieldReadonly('GeonetworkBaseURL');
+			$fields->makeFieldReadonly('Username');
+			$fields->makeFieldReadonly('EmailName');
+			$fields->makeFieldReadonly('SendConfitmationsTo');
+			$fields->makeFieldReadonly('RedirectOnSuccess');
 
-		$redirect->setDescription('Redirect the user to this page after a metadata record has been submitted, i.e. to show the details of the new record.');
+			$fields->makeFieldReadonly('AutoPublish');
+			$fields->makeFieldReadonly('Privilege');
+			$fields->makeFieldReadonly('GeonetworkGroupID_dp');
+
+
+			$fields->removeByName('Password');
+			$fields->removeByName('groupsbutton1');
+		} else {
+			$autopublish->setDescription('Set this option to enable automatic record publishing for new records. If enabled, privileges must be set.');
+			$gnGroupDropdown->setDescription('The GeoNetwork group defines the user group who owns new created records. It is a mandatory field.');
+			$checkboxset->setDescription('Once a record has been added to the catalog, define how the permissions to this records shall be set for public users.');
+
+			$url->setDescription('The base URL of the GeoNetwork-Server this page shall connect with, i.e. http://localhost:8080/geonetwork/');
+			$user->setDescription('Geonetwork user name.<br>'.'The user must be defined in GeoNetwork. All new records created via this page will be owned by this user in Geonetwork.');
+			$pass->setDescription('Geonetwork password.');
+			$name->setDescription('Name of the person who gets notified when new records are submitted.');
+			$email->setDescription('Email address of that person who receives the notifications.');
+			$redirect->setDescription('Redirect the user to this page after a metadata record has been submitted, i.e. to show the details of the new record.');
+		}
 
 		// return the modified fieldset.
 		return $fields;
