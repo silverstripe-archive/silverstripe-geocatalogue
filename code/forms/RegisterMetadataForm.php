@@ -40,7 +40,7 @@ class RegisterMetadataForm extends Form {
 
 		if(!$fields) {
 			// Create fields
-			
+
 			//adding extra class for custom validation
 			$title = new TextField('MDTitle',"TITLE"); 
 			$title->addExtraClass("required");
@@ -49,11 +49,11 @@ class RegisterMetadataForm extends Form {
 				new CompositeField (
 					$title,
 					new TextareaField('MDAbstract'),
-					new DateField('MDDateTime1','MDDateTime1',$this->MDDateTime1),
+					$dateField1 = new DateField('MDDateTime1','MDDateTime1',$this->MDDateTime1),
 					new DropdownField('MDDateType1','DateType',MDCodeTypes::get_date_types(),""),	// drop down
-					new DateField('MDDateTime2','MDDateTime2',$this->MDDateTime2),
+					$dateField2 = new DateField('MDDateTime2','MDDateTime2',$this->MDDateTime2),
 					new DropdownField('MDDateType2','DateType',MDCodeTypes::get_date_types(),""),	// drop down
-					new DateField('MDDateTime3','MDDateTime3',$this->MDDateTime3),
+					$dateField3 = new DateField('MDDateTime3','MDDateTime3',$this->MDDateTime3),
 					new DropdownField('MDDateType3','DateType',MDCodeTypes::get_date_types(),""),	// drop down
 					new ListboxField('MDTopicCategory','Category',MDCodeTypes::get_categories(),"",8,true)	// drop down
 				),
@@ -138,6 +138,9 @@ class RegisterMetadataForm extends Form {
 					new DropdownField('useLimitation','License',MDCodeTypes::get_use_limitation(),"")	// drop down				
 				)
 			);
+			$dateField1->setConfig('dateformat', 'dd/MM/yyyy');
+			$dateField2->setConfig('dateformat', 'dd/MM/yyyy');
+			$dateField3->setConfig('dateformat', 'dd/MM/yyyy');
 		}
 		if ($recaptchaField) {
 			$fields->push($recaptchaField);

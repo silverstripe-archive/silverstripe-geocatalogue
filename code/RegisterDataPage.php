@@ -252,7 +252,6 @@ class RegisterDataPage_Controller extends Page_Controller
 	 */
 	function doRegisterMetadata($data, $form) {
 		$page = $this->data();
-
 		// process form submission and send request to GeoNetwork.
 		foreach($data as $key => $value) {
 			if($key == "MDTopicCategory") continue; // Topic Category is an array of predefined values
