@@ -4,14 +4,15 @@
  * @package geocatalog
  * @subpackage tests
  */
-class TranslateXMLCommandTest extends SapphireTest {
+class TranslateXMLCommandTest extends SapphireTest
+{
 
-	/**
-	 * Also uses SimpleNzctFixture in setUp()
-	 */
-	static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
+    /**
+     * Also uses SimpleNzctFixture in setUp()
+     */
+    public static $fixture_file = 'geocatalogue/tests/GetRecordsCommandTest.yml';
 
-	static $ISO19139response='<?xml version="1.0" encoding="UTF-8"?>
+    public static $ISO19139response='<?xml version="1.0" encoding="UTF-8"?>
 				<csw:GetRecordsResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd">
 				  <csw:SearchStatus timestamp="2009-08-27T08:37:38" />
 				  <csw:SearchResults numberOfRecordsMatched="1" numberOfRecordsReturned="1" elementSet="summary" nextRecord="0">
@@ -196,9 +197,9 @@ class TranslateXMLCommandTest extends SapphireTest {
 				    </gmd:MD_Metadata>
 				  </csw:SearchResults>
 				</csw:GetRecordsResponse>
-';	
+';
 
-	static $HTMLResponseNoDocType='<html>
+    public static $HTMLResponseNoDocType='<html>
 	  <head>
 		<base href="http://www.silverstripe.com/" >
 		<title>SilverStripe.com - Open Source CMS / Framework</title>
@@ -208,246 +209,243 @@ class TranslateXMLCommandTest extends SapphireTest {
 		</body>
 	</html>';
 
-	static $EmptyXMLResponse='<?xml version="1.0" encoding="UTF-8"?><nothing></nothing>';
-	
-	protected $controller = null;
+    public static $EmptyXMLResponse='<?xml version="1.0" encoding="UTF-8"?><nothing></nothing>';
+    
+    protected $controller = null;
 
-	/**
-	 * Initiate the controller and page classes and configure GeoNetwork service
-	 * to use the mockup-controller for testing.
-	 */
-	function setUp() {
-		parent::setUp();
-		
-		$url = Director::absoluteBaseURL() . 'GetRecordsCommandTest_Controller';
+    /**
+     * Initiate the controller and page classes and configure GeoNetwork service
+     * to use the mockup-controller for testing.
+     */
+    public function setUp()
+    {
+        parent::setUp();
+        
+        $url = Director::absoluteBaseURL() . 'GetRecordsCommandTest_Controller';
 
-		$page = $this->objFromFixture('CataloguePage', 'catalogue');
-		$page->GeonetworkBaseURL  = $url;
+        $page = $this->objFromFixture('CataloguePage', 'catalogue');
+        $page->GeonetworkBaseURL  = $url;
 
-		$this->controller = new CataloguePage_Controller($page);
-		$this->controller->pushCurrent();
-		
-		GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
-	}
+        $this->controller = new CataloguePage_Controller($page);
+        $this->controller->pushCurrent();
+        
+        GetRecordsCommand::set_catalogue_url("/getrecords?usetestmanifest=1&flush=1");
+    }
 
-	/**
-	 * Remove test controller from global controller-stack.
-	 */
-	function tearDown() {
-		
-		$this->controller->popCurrent();
-		
-		parent::tearDown();
-	}
-
-
-	/**
-	 * testTranslateXMLCommand
-	 *
-	 * Using the standard Response translating it into PHP-Code to set up the 
-	 * the structure for MDMetadataObject 
-	 *
-	 */
-	function testTranslateXMLCommand() {
-
-		$baseURL = Director::baseFolder();
-		
-		//seting up the environment
-		$data = array(
-			'xml' => self::$ISO19139response,
-			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		$result = $cmd->execute();
-				
-		$position = strpos($result, '0587e442-eaee-470d-a0d1-3e3a54cc983b');
-
-		if ($position === false) {
-			$this->assertEquals(1,0,'UUID not found in translation.>>>'. $result . '<<<');
-		}
-	}
-	
-	/**
-	 * testTranslateXMLCommandWithHTMLResponseNoDoctype
-	 *
-	 * Using a valid HTML-Response without a DocType is the way of the geonetwork server to
-	 * indicate that an error has occured
-	 *
-	 */
-	function testTranslateXMLCommandWithHTMLResponseNoDoctype() {
-
-		$baseURL = Director::baseFolder();
-
-		//seting up the environment
-		$data = array(
-			'xml' => self::$HTMLResponseNoDocType ,
-			'xsl' => $baseURL.'/geocatalogue/xslt/iso19139_to_silverstripe.xsl',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			return;
-		}
-		$this->assertTrue(false,'TranslateXML should throw an error on html-content starting with <html>');
-	}
-
-	/**
-	 * testTranslateXMLCommandWithEmptyXMLResponse
-	 *
-	 * Using a valid XML-Response with just an empty
-	 * should result in an empty string 
-	 *
-	 */
-	function testTranslateXMLCommandWithEmptyXMLResponse() {
-
-		//seting up the environment
-		$baseURL = Director::baseFolder();
-
-		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			$this->assertTrue(false,'TranslateXML should NOT throw an error on valid xml-content');
-		}
-		$this->assertTrue(isset($result), 'results has not been set');
-		$this->assertTrue($result == '' , 'results must be an empty string');
-	}
-
-	/**
-	 * testTranslateXMLCommandWithEmptyResponse
-	 *
-	 * Using an empty Response should result in an empty string 
-	 *
-	 */
-	function testTranslateXMLCommandWithEmptyResponse() {
-
-		//seting up the environment
-		$baseURL = Director::baseFolder();
-
-		$data = array(
-			'xml' => '' ,
-			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			$this->assertTrue(false,'TranslateXML should NOT throw an error on empty Request');
-		}
-		$this->assertTrue(isset($result), 'results has been set');
-		$this->assertTrue($result == '' , 'results must be an empty string');
-	}
-
-	/**
-	 * testTranslateXMLCommandWithNullResponse
-	 *
-	 * Using a null Response should result in an empty string 
-	 *
-	 */
-	function testTranslateXMLCommandWithNullResponse() {
-
-		//seting up the environment
-		$baseURL = Director::baseFolder();
-
-		$data = array(
-			'xml' => null,
-			'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			return;// ok, we got an exception
-		}
-		$this->assertTrue(false,'TranslateXML should throw an error on null Request');
-	}
-
-	/**
-	 * testTranslateXMLCommandWithEmptyStylesheet
-	 *
-	 * Using an empty stylesheet should result in an exception 
-	 *
-	 */
-	function testTranslateXMLCommandWithEmptyStylesheet() {
-
-		//seting up the environment
-		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => '',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			return; //ok we got an excetion
-		}
-		$this->assertTrue(false,'TranslateXML should throw an exception on an empty stylesheet');
-	}
+    /**
+     * Remove test controller from global controller-stack.
+     */
+    public function tearDown()
+    {
+        $this->controller->popCurrent();
+        
+        parent::tearDown();
+    }
 
 
-	/**
-	 * testTranslateXMLCommandWithNullStylesheet
-	 *
-	 * Using NO stylesheet should result in an exception 
-	 *
-	 */
-	function testTranslateXMLCommandWithNullStylesheet() {
+    /**
+     * testTranslateXMLCommand
+     *
+     * Using the standard Response translating it into PHP-Code to set up the 
+     * the structure for MDMetadataObject 
+     *
+     */
+    public function testTranslateXMLCommand()
+    {
+        $baseURL = Director::baseFolder();
+        
+        //seting up the environment
+        $data = array(
+            'xml' => self::$ISO19139response,
+            'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        $result = $cmd->execute();
+                
+        $position = strpos($result, '0587e442-eaee-470d-a0d1-3e3a54cc983b');
 
-		//seting up the environment
-		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => null,
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			return; //ok we got an excetion
-		}
-		$this->assertTrue(false,'TranslateXML should throw an exception if there is NO stylesheet');
-	}
+        if ($position === false) {
+            $this->assertEquals(1, 0, 'UUID not found in translation.>>>'. $result . '<<<');
+        }
+    }
+    
+    /**
+     * testTranslateXMLCommandWithHTMLResponseNoDoctype
+     *
+     * Using a valid HTML-Response without a DocType is the way of the geonetwork server to
+     * indicate that an error has occured
+     *
+     */
+    public function testTranslateXMLCommandWithHTMLResponseNoDoctype()
+    {
+        $baseURL = Director::baseFolder();
 
-	/**
-	 * testTranslateXMLCommandWithInvalidStylesheet
-	 *
-	 * Using an invalid stylesheet should result in an exception 
-	 *
-	 */
-	function testTranslateXMLCommandWithInvalidStylesheet() {
+        //seting up the environment
+        $data = array(
+            'xml' => self::$HTMLResponseNoDocType ,
+            'xsl' => $baseURL.'/geocatalogue/xslt/iso19139_to_silverstripe.xsl',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            return;
+        }
+        $this->assertTrue(false, 'TranslateXML should throw an error on html-content starting with <html>');
+    }
 
-		//seting up the environment
-		$data = array(
-			'xml' => self::$EmptyXMLResponse ,
-			'xsl' => '../NoStylesheetFound',
-		);
-		$cmd = $this->controller->getCommand("TranslateXML", $data);
-		//execute has not to throw an error
-		try {
-			$result = $cmd->execute();
-		}
-		catch(TranslateXMLCommand_Exception $e) {
-			return; //ok we got an excetion
-		}
-		$this->assertTrue(false,'TranslateXML should throw an exception if the stylesheet could not be found');
-	}
+    /**
+     * testTranslateXMLCommandWithEmptyXMLResponse
+     *
+     * Using a valid XML-Response with just an empty
+     * should result in an empty string 
+     *
+     */
+    public function testTranslateXMLCommandWithEmptyXMLResponse()
+    {
+
+        //seting up the environment
+        $baseURL = Director::baseFolder();
+
+        $data = array(
+            'xml' => self::$EmptyXMLResponse ,
+            'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            $this->assertTrue(false, 'TranslateXML should NOT throw an error on valid xml-content');
+        }
+        $this->assertTrue(isset($result), 'results has not been set');
+        $this->assertTrue($result == '', 'results must be an empty string');
+    }
+
+    /**
+     * testTranslateXMLCommandWithEmptyResponse
+     *
+     * Using an empty Response should result in an empty string 
+     *
+     */
+    public function testTranslateXMLCommandWithEmptyResponse()
+    {
+
+        //seting up the environment
+        $baseURL = Director::baseFolder();
+
+        $data = array(
+            'xml' => '' ,
+            'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            $this->assertTrue(false, 'TranslateXML should NOT throw an error on empty Request');
+        }
+        $this->assertTrue(isset($result), 'results has been set');
+        $this->assertTrue($result == '', 'results must be an empty string');
+    }
+
+    /**
+     * testTranslateXMLCommandWithNullResponse
+     *
+     * Using a null Response should result in an empty string 
+     *
+     */
+    public function testTranslateXMLCommandWithNullResponse()
+    {
+
+        //seting up the environment
+        $baseURL = Director::baseFolder();
+
+        $data = array(
+            'xml' => null,
+            'xsl' => $baseURL.'/geocatalogue/xslt/ISO19139/iso19139_to_silverstripe.xsl',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            return;// ok, we got an exception
+        }
+        $this->assertTrue(false, 'TranslateXML should throw an error on null Request');
+    }
+
+    /**
+     * testTranslateXMLCommandWithEmptyStylesheet
+     *
+     * Using an empty stylesheet should result in an exception 
+     *
+     */
+    public function testTranslateXMLCommandWithEmptyStylesheet()
+    {
+
+        //seting up the environment
+        $data = array(
+            'xml' => self::$EmptyXMLResponse ,
+            'xsl' => '',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            return; //ok we got an excetion
+        }
+        $this->assertTrue(false, 'TranslateXML should throw an exception on an empty stylesheet');
+    }
 
 
-	
+    /**
+     * testTranslateXMLCommandWithNullStylesheet
+     *
+     * Using NO stylesheet should result in an exception 
+     *
+     */
+    public function testTranslateXMLCommandWithNullStylesheet()
+    {
+
+        //seting up the environment
+        $data = array(
+            'xml' => self::$EmptyXMLResponse ,
+            'xsl' => null,
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            return; //ok we got an excetion
+        }
+        $this->assertTrue(false, 'TranslateXML should throw an exception if there is NO stylesheet');
+    }
+
+    /**
+     * testTranslateXMLCommandWithInvalidStylesheet
+     *
+     * Using an invalid stylesheet should result in an exception 
+     *
+     */
+    public function testTranslateXMLCommandWithInvalidStylesheet()
+    {
+
+        //seting up the environment
+        $data = array(
+            'xml' => self::$EmptyXMLResponse ,
+            'xsl' => '../NoStylesheetFound',
+        );
+        $cmd = $this->controller->getCommand("TranslateXML", $data);
+        //execute has not to throw an error
+        try {
+            $result = $cmd->execute();
+        } catch (TranslateXMLCommand_Exception $e) {
+            return; //ok we got an excetion
+        }
+        $this->assertTrue(false, 'TranslateXML should throw an exception if the stylesheet could not be found');
+    }
 }

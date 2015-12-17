@@ -9,31 +9,32 @@
  * MDTopicCategory implements the ISO19139 structure for topic categories. It will 
  * be stored alongside with MDMetadata class.
  */
-class MDTopicCategory extends MDDataObject {
+class MDTopicCategory extends MDDataObject
+{
 
-	/**
-	 * Data structure for MDTopicCategory
-	 */	
-	static $db = array(
-		"Value" => "Varchar",
-	);
-	
-	/**
-	 * Data relationships for MDTopicCategory
-	 */
-	static $has_one = array(
-		"MDMetadata" => "MDMetadata",
-	);
+    /**
+     * Data structure for MDTopicCategory
+     */
+    public static $db = array(
+        "Value" => "Varchar",
+    );
+    
+    /**
+     * Data relationships for MDTopicCategory
+     */
+    public static $has_one = array(
+        "MDMetadata" => "MDMetadata",
+    );
 
-	public function getTopicCategoryNice() {
-		$retValue = '';
-		$codeTypes = MDCodeTypes::get_categories();
-		if (isset($codeTypes[$this->Value])) {
-			if ($codeTypes[$this->Value] != "(please select a category)") {
-				$retValue = $codeTypes[$this->Value];
-			}
-		}
-		return $retValue;
-	}
-	
+    public function getTopicCategoryNice()
+    {
+        $retValue = '';
+        $codeTypes = MDCodeTypes::get_categories();
+        if (isset($codeTypes[$this->Value])) {
+            if ($codeTypes[$this->Value] != "(please select a category)") {
+                $retValue = $codeTypes[$this->Value];
+            }
+        }
+        return $retValue;
+    }
 }

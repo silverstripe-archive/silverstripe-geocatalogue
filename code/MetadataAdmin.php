@@ -8,22 +8,23 @@
 /**
  * 
  */
-class MetadataAdmin extends ModelAdmin {
-	static $menu_title = "Metadata";
-	static $url_segment = "metadata";
-	
-	function init(){
-		parent::init();
-	}
-	
-	static $managed_models = array(
-		"MDMetadata",
-		"MDContact",
-	);
-	
-	static $allowed_actions = array(
-		"MDMetadata",
-		"MDContact",
-	);
-
+class MetadataAdmin extends ModelAdmin
+{
+    public static $menu_title = "Metadata";
+    public static $url_segment = "metadata";
+    
+    public function init()
+    {
+        parent::init();
+    }
+    
+    public static $managed_models = array(
+        "MDMetadata",
+        "MDContact",
+    );
+    
+    public static $allowed_actions = array(
+        "MDMetadata",
+        "MDContact",
+    );
 }

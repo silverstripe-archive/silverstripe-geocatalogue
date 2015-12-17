@@ -9,20 +9,20 @@
  * MDKeyword implements the ISO19139 structure for metadata keywords. It will 
  * be stored alongside with MDMetadata class.
  */
-class MDKeyword extends MDDataObject {
+class MDKeyword extends MDDataObject
+{
 
-	/**
-	 * Data structure for MDKeyword
-	 */	
-	static $db = array(
-		"Value" => "Varchar",
-	);
-	
-	/**
-	 * Data relationships for MDKeyword
-	 */
-	static $has_one = array(
-		"MDMetadata" => "MDMetadata",
-	);
-	
+    /**
+     * Data structure for MDKeyword
+     */
+    public static $db = array(
+        "Value" => "Varchar",
+    );
+    
+    /**
+     * Data relationships for MDKeyword
+     */
+    public static $has_one = array(
+        "MDMetadata" => "MDMetadata",
+    );
 }

@@ -1,13 +1,14 @@
 <?php
 
-class ParseXML2MCPSummaryCommand  extends ParseXMLCommand {
+class ParseXML2MCPSummaryCommand  extends ParseXMLCommand
+{
 
     /**
      * @param $doc
      * @return array
      */
-    public function parseDocument($doc) {
-
+    public function parseDocument($doc)
+    {
         $response = $doc->getElementsByTagNameNS('http://www.opengis.net/cat/csw/2.0.2', "GetRecordsResponse");
 
         $status = $response->item(0)->getElementsByTagName("SearchResults");
@@ -81,7 +82,4 @@ class ParseXML2MCPSummaryCommand  extends ParseXMLCommand {
 //        var_dump($mdArray);
         return array($numberOfRecordsMatched, $numberOfRecordsReturned, $nextRecord, $mdArray);
     }
-
-
-
 }

@@ -11,26 +11,30 @@
  *
  * This page type is used to browse GeoNetwork data and visualise the results.
  */
-class BrowsePage extends CataloguePage {
-	
-	/**
-	 * Overwrites {@link SiteTree::getCMSFields}.
-	 * 
-	 * Appends a GeoNetwork JavaScript validator the the CMS backend.
-	 *
-	 * @return FieldSet
-	 */ 
-	function getCMSFields() {
-		Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
-		
-		$fields = parent::getCMSFields();
-		return $fields;
-	} 
+class BrowsePage extends CataloguePage
+{
+    
+    /**
+     * Overwrites {@link SiteTree::getCMSFields}.
+     * 
+     * Appends a GeoNetwork JavaScript validator the the CMS backend.
+     *
+     * @return FieldSet
+     */
+    public function getCMSFields()
+    {
+        Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
+        
+        $fields = parent::getCMSFields();
+        return $fields;
+    }
 }
 
-class Browser_QueryClass extends Catalogue_QueryClass {
+class Browser_QueryClass extends Catalogue_QueryClass
+{
 
-    public function validate() {
+    public function validate()
+    {
     }
 }
 
@@ -41,30 +45,34 @@ class Browser_QueryClass extends Catalogue_QueryClass {
  * class handles the requests and delegates the requests to the page instance
  * as well as to the available GeoNetwork node.
  */
-class BrowsePage_Controller extends CataloguePage_Controller {
+class BrowsePage_Controller extends CataloguePage_Controller
+{
 
-    protected function getQueryClass($params) {
+    protected function getQueryClass($params)
+    {
         return new Browser_QueryClass($params);
     }
 
     /**
-	 * Validate HTTP-Request parameter.
-	 *
-	 * BrowsePage customise the search capabilities and allows the 'empty' search.
-	 *
-	 * @param array $params http-request parameter
-	 */
-	protected function validateRequest($params) {
-	}
-	
-	/**
-	 * Action: index 
-	 * 
-	 * Browse Page perform a empty search to populate the all results on the 
-	 * Browse Page.
-	 */
-	public function index($data) {
-		$html=  $this->dogetrecords($data);
+     * Validate HTTP-Request parameter.
+     *
+     * BrowsePage customise the search capabilities and allows the 'empty' search.
+     *
+     * @param array $params http-request parameter
+     */
+    protected function validateRequest($params)
+    {
+    }
+    
+    /**
+     * Action: index 
+     * 
+     * Browse Page perform a empty search to populate the all results on the 
+     * Browse Page.
+     */
+    public function index($data)
+    {
+        $html=  $this->dogetrecords($data);
         return $html;
-	}
+    }
 }

@@ -12,13 +12,14 @@
  * visualization. The @see CataloguePage.ss template is used to visualise the
  * search form and the search result.
  */
-class CataloguePage extends Page {
+class CataloguePage extends Page
+{
 
     public static $db = array('ResultsPerSearchPage' => "Int",
                               'GeonetworkBaseURL' => "Varchar",
                               'GeonetworkUsername' => "Varchar",
                               'GeonetworkPassword' => "Varchar",);
-    static $defaults = array('ResultsPerSearchPage' => 10);
+    public static $defaults = array('ResultsPerSearchPage' => 10);
     /**
      * This variable defines the status of the website. If it is set to
      * 'setup', the GoeNetwork configuration fields are editable. Otherwise
@@ -28,7 +29,8 @@ class CataloguePage extends Page {
      */
     protected static $siteStatus = 'live';
 
-    static function set_site_status($value) {
+    public static function set_site_status($value)
+    {
         CataloguePage::$siteStatus = $value;
     }
 
@@ -36,7 +38,8 @@ class CataloguePage extends Page {
      *
      * @return FieldList
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields = parent::getCMSFields();
 
         Requirements::javascript('geocatalogue/javascript/GeonetworkUrlValidator.js');
@@ -57,14 +60,16 @@ class CataloguePage extends Page {
         return $fields;
     }
 
-    static function get_site_status() {
+    public static function get_site_status()
+    {
         return CataloguePage::$siteStatus;
     }
 
     /**
      * Make sure Geonetwork url ends with an /.
      */
-    function onBeforeWrite() {
+    public function onBeforeWrite()
+    {
         parent::onBeforeWrite();
         $this->GeonetworkBaseURL = $this->addEndingSlash($this->GeonetworkBaseURL);
     }
@@ -77,17 +82,21 @@ class CataloguePage extends Page {
      * @param $url
      * @return string $url with ending '/'
      */
-    private function addEndingSlash($url) {
+    private function addEndingSlash($url)
+    {
         if (strlen($url) > 1) {
             $length = strlen($url) - 1;
 
-            if ($url[$length] != '/') $url .= '/';
+            if ($url[$length] != '/') {
+                $url .= '/';
+            }
         }
         return $url;
     }
 
 
-    public function getMaxRecordsPerPage() {
+    public function getMaxRecordsPerPage()
+    {
         $result = (int)$this->ResultsPerSearchPage;
 
         if (!isset($result) || $result == 0) {
@@ -104,25 +113,31 @@ class CataloguePage extends Page {
  * class handles the requests and delegates the requests to the page instance
  * as well as to the available GeoNetwork node.
  */
-class CataloguePage_Controller extends Page_Controller {
+class CataloguePage_Controller extends Page_Controller
+{
 
     private static $allowed_actions = array('dogetrecordbyid', 'dogetrecords');
 
     protected $maxRecords = 10;
 
-    public static function get_search_form_name() {
+    public static function get_search_form_name()
+    {
         $formname = Config::inst()->get('Catalogue', 'search_form');
         return $formname;
     }
 
-    public function getGeoNetworkBaseURL() {
+    public function getGeoNetworkBaseURL()
+    {
         $url = $this->data()->GeonetworkBaseURL;
-        if (!isset($url) || $url == '') throw new CataloguePage_Exception('URL to Metadata Catalogue not defined.');
+        if (!isset($url) || $url == '') {
+            throw new CataloguePage_Exception('URL to Metadata Catalogue not defined.');
+        }
 
         return $url;
     }
 
-    public function init() {
+    public function init()
+    {
         parent::init();
         Requirements::css('geocatalogue/css/cataloguepage.css');
     }
@@ -136,8 +151,8 @@ class CataloguePage_Controller extends Page_Controller {
      *
      * @throws CataloguePage_Exception
      */
-    public function dogetrecords(SS_HTTPRequest $request) {
-
+    public function dogetrecords(SS_HTTPRequest $request)
+    {
         $format = Config::inst()->get('Catalogue', 'metadata_standard');
         if (!$this->validateRequestFormat($format)) {
             throw new CataloguePage_Exception('Invalid configuration: metadata format not supported.');
@@ -197,7 +212,8 @@ class CataloguePage_Controller extends Page_Controller {
 
         // calculate pagination values
         $this->calculatePaginationValues($resultSet, $query);
-        return $this->render();;
+        return $this->render();
+        ;
     }
 
     /**
@@ -209,7 +225,8 @@ class CataloguePage_Controller extends Page_Controller {
      *
      * @throws CataloguePage_Exception
      */
-    public function dogetrecordbyid($httpRequest) {
+    public function dogetrecordbyid($httpRequest)
+    {
         $params = $httpRequest->allParams();
 
         if (!$params['ID']) {
@@ -288,7 +305,8 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $format
      * @return bool
      */
-    private function validateRequestFormat($format) {
+    private function validateRequestFormat($format)
+    {
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
         return isset($standards[$format]);
     }
@@ -299,12 +317,14 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $params
      * @return Catalogue_QueryClass
      */
-    protected function getQueryClass($params) {
+    protected function getQueryClass($params)
+    {
         return new Catalogue_QueryClass($params);
     }
 
 
-    public function prefixx() {
+    public function prefixx()
+    {
         return $this->URLSegment;
     }
 
@@ -314,7 +334,8 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $searchTerm
      * @return mixed
      */
-    public function parseResponse($standard, $responseXML, $searchTerm) {
+    public function parseResponse($standard, $responseXML, $searchTerm)
+    {
         $standards = Config::inst()->get('Catalogue', 'standard_definitions');
 
         $data = array('xml' => $responseXML);
@@ -338,8 +359,8 @@ class CataloguePage_Controller extends Page_Controller {
      * @param $resultSet
      * @param $query
      */
-    protected function calculatePaginationValues($resultSet, $query) {
-
+    protected function calculatePaginationValues($resultSet, $query)
+    {
         $nextRecord = $resultSet->__get('nextRecord');
         $startPosition = $query->get('startPosition');
 
@@ -361,7 +382,9 @@ class CataloguePage_Controller extends Page_Controller {
         $this->data()->pagination_next_index = $temp;
 
         $temp = $startPosition - $this->maxRecords;
-        if ($temp < 1) $temp = 1;
+        if ($temp < 1) {
+            $temp = 1;
+        }
         $this->data()->pagination_prev_index = $temp;
     }
 
@@ -369,16 +392,19 @@ class CataloguePage_Controller extends Page_Controller {
      * @param SS_HTTPRequest $request
      * @return array
      */
-    private function processRequestParameters(SS_HTTPRequest $request) {
+    private function processRequestParameters(SS_HTTPRequest $request)
+    {
         $params = array();
         if ($request != null) {
             $params = $request->allParams();
             $variables = $request->getVars();
 
             $params['startPosition'] = $params['ID'];
-            if ($params['startPosition'] < 1) $params['startPosition'] = 1;
+            if ($params['startPosition'] < 1) {
+                $params['startPosition'] = 1;
+            }
 
-            if ( isset($variables['searchTerm'])) {
+            if (isset($variables['searchTerm'])) {
                 $params['searchTerm'] = $variables['searchTerm'];
             }
 
@@ -398,8 +424,8 @@ class CataloguePage_Controller extends Page_Controller {
      *
      * @return Form Simple Search Form
      */
-    function GeoNetworkSearchForm() {
-
+    public function GeoNetworkSearchForm()
+    {
         $controller = Controller::curr();
 
         $httpRequest = $controller->getRequest();
@@ -417,7 +443,9 @@ class CataloguePage_Controller extends Page_Controller {
             } else {
                 $defaults['searchTerm'] = $httpParams['OtherID'];
             }
-            if (isset($params['format'])) $defaults['format'] = self::validate_request_format($params['format']);
+            if (isset($params['format'])) {
+                $defaults['format'] = self::validate_request_format($params['format']);
+            }
         }
 
         if (isset($params['bboxUpper']) && isset($params['bboxLower'])) {
@@ -430,11 +458,11 @@ class CataloguePage_Controller extends Page_Controller {
         $form = new $searchForm($this, 'dogetrecords', null, null, null, $defaults);
         return $form;
     }
-
 }
 
 /**
  * Catalogue-Page Exception Class
  */
-class CataloguePage_Exception extends Exception {
+class CataloguePage_Exception extends Exception
+{
 }
