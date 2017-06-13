@@ -9,7 +9,6 @@
 
 class ParseXML2MCPCommand extends ParseXMLCommand
 {
-
     public function parseDocument($doc)
     {
         $numberOfRecordsMatched = 0;
@@ -172,7 +171,7 @@ class ParseXML2MCPCommand extends ParseXMLCommand
                 $keywords = array();
                 $xmlList = $xpath->query('gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword', $dataIdentification);
                 foreach ($xmlList as $item) {
-                    $keywords[]  = $this->queryNodeValue($xpath, 'gco:CharacterString', $item);
+                  $keywords[]  = array('Value' => $this->queryNodeValue($xpath, 'gco:CharacterString', $item));
                 }
                 $mdItem['MDKeywords:MDKeyword'] = $keywords;
 
@@ -254,10 +253,6 @@ class ParseXML2MCPCommand extends ParseXMLCommand
                 }
             }
             $mdArray[] = $mdItem;
-//
-//            echo "<pre>";
-//            print_r($mdArray);
-//            echo "</pre>";
         }
         return array($numberOfRecordsMatched, $numberOfRecordsReturned, $nextRecord, $mdArray);
     }

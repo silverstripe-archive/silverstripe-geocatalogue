@@ -5,11 +5,11 @@
  * @subpackage model
  *
  * The MDMetadata class implements the core Metadata dataobject
- * to store ISO19139 metadata. This dataobject is used to render the search 
+ * to store ISO19139 metadata. This dataobject is used to render the search
  * results onto the CataloguePage (@link CataloguePage) and for processing
  * a metadata registration (@link RegisterDataPage).
  *
- * ISO19139 is a OGC metadata standard and 'replaces/derives' from ISO19115. 
+ * ISO19139 is a OGC metadata standard and 'replaces/derives' from ISO19115.
  * Other standards are:
  *  - ISO19119
  *  - DublinCore
@@ -17,7 +17,7 @@
  */
 class MDMetadata extends MDDataObject
 {
-    
+
     /**
      * Data Structure for ISO19139 mandatory core data fields
      * @var array
@@ -29,11 +29,11 @@ class MDMetadata extends MDDataObject
 
         "metadataStandardName" => "Varchar",
         "metadataStandardVersion" => "Varchar",
-        
+
         "MDTitle" => "Varchar",                                // mandatory
         "MDAbstract" => "Varchar",                            // mandatory
         "MDPurpose" => "Varchar",
-        "MDLanguage" => "Varchar",                            // mandatory    
+        "MDLanguage" => "Varchar",                            // mandatory
         "MDEdition" => "Varchar",
         "MDPresentationForm" => "Varchar",
 
@@ -54,9 +54,9 @@ class MDMetadata extends MDDataObject
         "MDAbstract" => "Abstract",
         "MDGeographicDiscription" => "GeographicDiscription",
     );
-    
+
     /**
-     * Relationship to other data-objects. Implement a semi ISO19139 
+     * Relationship to other data-objects. Implement a semi ISO19139
      * implementation recommondation.
      * @var array
      */
@@ -73,7 +73,7 @@ class MDMetadata extends MDDataObject
         "MDHierarchyLevel" => "MDHierarchyLevel", // ANZLIC
         "MDHierarchyLevelName" => "MDHierarchyLevelName" // ANZLIC
     );
-    
+
     /**
      * Being able to configure what is shown as 'online urls' in templates.
      */
@@ -82,8 +82,8 @@ class MDMetadata extends MDDataObject
     );
 
     /**
-     * Sets the whiltelist array for online web urls protocol. 
-     * This array will be used to remove online-resources 
+     * Sets the whiltelist array for online web urls protocol.
+     * This array will be used to remove online-resources
      * from the metadata-detail page.
      *
      * @param $value Array of protocol values, such as array('WWW:LINK-1.0-http--downloaddata', 'WWW:LINK-1.0-http--link')
@@ -102,12 +102,12 @@ class MDMetadata extends MDDataObject
     {
         return $this->getFilteredCIOnlineResources(self::get_online_resource_web_url_filter());
     }
-    
+
     public function MetadataCIOnlineResources()
     {
         return $this->getFilteredCIOnlineResources(array('WWW:LINK-1.0-http--metadata-URL'));
     }
-    
+
     /**
      * Returns all CIOnlineResources objects of this metadata record which
      * are web-addresses.
@@ -118,15 +118,15 @@ class MDMetadata extends MDDataObject
      */
     public function getFilteredCIOnlineResources($filter = null)
     {
-        // important: don't pass in the filter into the get-component 
+        // important: don't pass in the filter into the get-component
         // method because it would try to get the data from the database
         // and would not use the memory/cached version.
         $resources = $this->getComponents('CIOnlineResources');
         $result = new ArrayList();
 
         $protocols = $filter;
-        
-        // if $filter is null, then get the default list, stored in 
+
+        // if $filter is null, then get the default list, stored in
         // CIOnlineResource.
         if ($filter == null) {
             $protocols = CIOnlineResource::get_public_protocols();
@@ -191,7 +191,7 @@ class MDMetadata extends MDDataObject
         $result = '';
         foreach ($this->MDCitationDates() as $date) {
             if ($date != null) {
-                
+
                 // strtotime doesn't like british dates so we reverse it first
                 $tempDate=$date->MDDateTime;
                 $dateParts=explode('/', $tempDate);
@@ -205,7 +205,7 @@ class MDMetadata extends MDDataObject
         }
         return $result;
     }
-    
+
     /**
      * Returns the MDDateTime in RFC3339 string format (incl. timezone).
      * This is required for the atom feed support.
@@ -214,7 +214,7 @@ class MDMetadata extends MDDataObject
     {
         return $this->getDateTimeInRFC3339('creation');
     }
-    
+
     /**
      * Returns the MDDateTime in RFC3339 string format (incl. timezone).
      * This is required for the atom feed support.
@@ -223,7 +223,7 @@ class MDMetadata extends MDDataObject
     {
         return $this->getDateTimeInRFC3339('publication');
     }
-    
+
     /**
      * Returns the nice, human readable string for the codetype (defined by
      * the OGC ISO standard).
@@ -255,7 +255,7 @@ class MDMetadata extends MDDataObject
     {
         $index = $this->MDSpatialRepresentationType;
         $codeTypes = MDCodeTypes::get_spatial_representation_type();
-        
+
         return isset($codeTypes[$index]) ? $codeTypes[$index] : MDCodeTypes::$default_for_null_value;
     }
 
@@ -268,7 +268,7 @@ class MDMetadata extends MDDataObject
     public function getPlaceName()
     {
         $index = $this->MDWestBound.";".$this->MDEastBound.";".$this->MDSouthBound.";".$this->MDNorthBound;
-        
+
         $result = '';
 
         $codeTypes = MDCodeTypes::get_places();
@@ -297,31 +297,31 @@ class MDMetadata extends MDDataObject
         if ($data == null) {
             return;
         }
-        
+
         if (!is_array($data)) {
             return;
         }
-                
+
         foreach ($data as $k => $v) {
             // store data into this object (no ':" in the string)
             if (strpos($k, ':') === false) {
                 $this->$k =  Convert::xml2raw($v);
             } else {
-                // A ':' is used as a namespace marker. It is used to 
+                // A ':' is used as a namespace marker. It is used to
                 // create the related data objects, such as MDContacts.
                 $relations = explode(':', $k);
                 $fieldName = array_pop($relations);
                 $relObj = $this;
 
-                // iterate through the relationships. At the moment, this 
-                // loading process just works for 1 level hierarchies. 
+                // iterate through the relationships. At the moment, this
+                // loading process just works for 1 level hierarchies.
                 foreach ($relations as $relation) {
                     if ($relation == 'PointOfContacts') {
-                        
+
                         // load the sub-array into the MDContact object
                         $item = new MDContact();
                         $item->loadData($v);
-                        
+
                         // add the new MDContect to the collection class of this
                         // object.
                         $relObj->PointOfContacts()->add($item);
@@ -331,7 +331,7 @@ class MDMetadata extends MDDataObject
                         // load the sub-array into the MDContact object
                         $item = new MDContact();
                         $item->loadData($v);
-                        
+
                         // add the new MDContect to the collection class of this
                         // object.
                         $relObj->MDContacts()->add($item);
@@ -342,7 +342,7 @@ class MDMetadata extends MDDataObject
                             foreach ($v as $vitem) {
                                 $item = new MDResourceConstraint();
                                 $item->loadData($vitem);
-                        
+
                                 // add the new MDContect to the collection class of this
                                 // object.
                                 $relObj->MDResourceConstraints()->add($item);
@@ -355,7 +355,7 @@ class MDMetadata extends MDDataObject
                                 // load the sub-array into the MDResourceFormats object
                                 $item = new MDResourceFormat();
                                 $item->loadData($vitem);
-                        
+
                                 // add the new MDContect to the collection class of this
                                 // object.
                                 $relObj->MDResourceFormats()->add($item);
@@ -369,10 +369,24 @@ class MDMetadata extends MDDataObject
                                 // load the sub-array into the MDResourceFormats object
                                 $item = new MDTopicCategory();
                                 $item->loadData($vitem);
-                        
+
                                 // add the new MDTopicCategory to the collection class of this
                                 // object.
                                 $relObj->MDTopicCategory()->add($item);
+                            }
+                        }
+                    }
+
+                    if ($relation == 'MDKeywords') {
+                        if (is_array($v)) {
+                            foreach ($v as $vitem) {
+                                // load the sub-array into the MDKeyword object
+                                $item = new MDKeyword();
+                                $item->loadData($vitem);
+
+                                // add the new MDKeyword to the collection class of this
+                                // object.
+                                $relObj->MDKeywords()->add($item);
                             }
                         }
                     }
@@ -429,7 +443,7 @@ class MDMetadata extends MDDataObject
                             }
                         }
                     }
-                    
+
                     if ($relation == 'MDHierarchyLevelName') {
                         if (is_array($v)) {
                             foreach ($v as $vitem) {
